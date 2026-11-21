@@ -104,6 +104,31 @@ Still open here: the layout for future applications (`apps/<name>/` is the
 current, reversible choice), the PEN manifest format, and how a consumer
 references a PENS checkout.
 
+### D-008 — The PENS desktop surface enters the repository
+
+The owner supplied the PENS UI on 2026-11-22 (Asia/Shanghai) and asked for it to
+be integrated into PENS and pushed. Source: the Open Design project `pens-demo`,
+whose HTML artifact was created 2026-11-11, copied into `apps/pens-ui/`.
+
+What is true after the import:
+
+- `index.html`, `main.cjs` and `package-win.cjs` are byte-identical to the
+  export. `package.json` changed only in `name` (`pens-demo` → `pens-ui`) and
+  description; a README and `.gitignore` were added.
+- The UI is one self-contained file: four pages (常用 / 数字人 / 游戏 / 生产力),
+  sixteen entries, search and install dialogs, and `localStorage`-only state.
+  It makes no network requests. Twelve entries are implemented in the UI;
+  数字人, 语音伙伴, 小游戏 and 数独 are placeholders.
+- `main.cjs` is a minimal Electron 45.4.1 window with `contextIsolation`,
+  `sandbox`, no Node integration, and denied navigation/popups. It is a run
+  harness, **not** the desktop-shell decision: the shell choice is still open.
+- Nothing is a PEN: no manifest, identity, permissions, lifecycle, or
+  agent-facing contract. Nothing is wired to `apps/stage-app/`, and the
+  Hermes/Codex proof is untouched.
+- Distribution is out of scope. `node_modules/`, `dist/` (a 507 MB packaged
+  build) and the Open Design caches (`.file-versions/`, `.od-frames/`,
+  `.od-skills/`, `index.html.artifact.json`) were not imported.
+
 ## Proposed technical direction
 
 These recommendations are retained for the next design discussion. They are

@@ -12,7 +12,7 @@ VIVY is a prospective consumer alongside other agents.
 
 ## Project status
 
-**Decisions, repository bootstrap, and the first application source.** No
+**Decisions, repository bootstrap, and the first application sources.** No
 PENS runtime, application package format, SDK, desktop shell, or agent
 integration has been implemented or tested here.
 
@@ -26,6 +26,12 @@ integration has been implemented or tested here.
   with its commit history. It is a standalone presentation process with a
   token-guarded local HTTP API. It is not packaged as a PEN yet, and no PENS
   runtime loads it. See [D-007](docs/DECISIONS.md).
+- `apps/pens-ui/` — the PENS desktop surface, imported on 2026-11-22 from the
+  owner's Open Design export: one self-contained HTML launcher (four pages,
+  sixteen entries) and a minimal Electron 45.4.1 runner. UI only: no PEN
+  package, no runtime, no agent integration, and nothing wired to the stage.
+  The wrapper does not settle the desktop-shell question. See
+  [D-008](docs/DECISIONS.md).
 
 ## Product direction
 

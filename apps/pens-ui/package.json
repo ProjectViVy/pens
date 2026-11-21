@@ -1,0 +1,16 @@
+{
+  "name": "pens-ui",
+  "productName": "PENS",
+  "version": "0.1.0",
+  "description": "PENS desktop UI",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "package:win": "node package-win.cjs"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "electron": "45.4.1"
+  }
+}
