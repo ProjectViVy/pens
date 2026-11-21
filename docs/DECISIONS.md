@@ -1,6 +1,6 @@
 # PENS founding decisions
 
-Date: 2026-09-29 (Asia/Shanghai).
+Date: 2026-09-29 (Asia/Shanghai); updated 2026-11-21.
 Source: the project owner's discussion and repository initialization request.
 
 This is the current decision record for PENS. **Confirmed** means explicitly
@@ -76,6 +76,34 @@ The exact Hermes distribution/version and Codex surface/version must be
 pinned during the integration investigation. No integration test has run.
 VIVY remains a later prospective consumer; no rollout schedule is assigned.
 
+### D-007 — The stage application moves into PENS
+
+Confirmed on 2026-11-21 (Asia/Shanghai): the owner moved the Live2D character
+stage out of the agent repository. Its source was imported from
+`vivy-dsh/dsh-stage-app` (commit `828bf5c3`) into `apps/stage-app/` with its
+commit history. The DIVA repository will reference the PENS checkout instead
+of keeping its own copy, and this machine will stop keeping
+`dsh-live2d`-type resources. The second and third parts are stated direction,
+not done work.
+
+What is true after the import:
+
+- The imported tree is identical to the source commit (39 tracked files, same
+  blob hashes). The source repository still exists and remains provenance for
+  its own history.
+- The application is **not** packaged as a PEN: no manifest, identity,
+  permissions, lifecycle, or agent-facing contract has been defined. Its
+  existing token-guarded local HTTP API is its only interface.
+- Proprietary assets stay out of the repository, as before: Live2D Cubism Core
+  (`apps/stage-app/vendor/live2dcubismcore.min.js`), the Hiyori sample model
+  (`apps/stage-app/demo/Hiyori/`), and character models are supplied locally.
+- No PENS runtime, SDK, or agent integration exists, so nothing here validates
+  the Hermes/Codex proof.
+
+Still open here: the layout for future applications (`apps/<name>/` is the
+current, reversible choice), the PEN manifest format, and how a consumer
+references a PENS checkout.
+
 ## Proposed technical direction
 
 These recommendations are retained for the next design discussion. They are
@@ -100,9 +128,11 @@ stack, personality system, or memory system inside PENS.
 
 Use one real PEN package with Hermes and Codex in separate test runs. The
 application's business code should be identical; host integration adapters
-may differ. The first application has not been selected. Minecraft was an
-assistant-proposed candidate, and Browser PEN was a historical DIVA proposal;
-neither is an approved PENS starting point.
+may differ. The first application for this proof has not been selected.
+Minecraft was an assistant-proposed candidate, and Browser PEN was a historical
+DIVA proposal; neither is an approved PENS starting point. D-007 imported the
+stage application as repository code, but it is not a packaged PEN and has not
+been used in either host.
 
 | Check | Evidence needed |
 | --- | --- |

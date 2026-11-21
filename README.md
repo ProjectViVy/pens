@@ -12,11 +12,20 @@ VIVY is a prospective consumer alongside other agents.
 
 ## Project status
 
-**Decisions and repository bootstrap only.** No runtime, application package,
-SDK, desktop shell, or agent integration has been implemented or tested here.
+**Decisions, repository bootstrap, and the first application source.** No
+PENS runtime, application package format, SDK, desktop shell, or agent
+integration has been implemented or tested here.
 
 - [Founding decisions and open questions](docs/DECISIONS.md)
 - [Historical research and source provenance](docs/REFERENCES.md)
+
+## Applications
+
+- `apps/stage-app/` — Live2D character stage, imported on 2026-11-21 from
+  [vivy-dsh/dsh-stage-app](https://github.com/vivy-dsh/dsh-stage-app) together
+  with its commit history. It is a standalone presentation process with a
+  token-guarded local HTTP API. It is not packaged as a PEN yet, and no PENS
+  runtime loads it. See [D-007](docs/DECISIONS.md).
 
 ## Product direction
 
