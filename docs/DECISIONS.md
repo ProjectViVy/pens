@@ -129,6 +129,34 @@ What is true after the import:
   build) and the Open Design caches (`.file-versions/`, `.od-frames/`,
   `.od-skills/`, `index.html.artifact.json`) were not imported.
 
+Moved to the repository root on 2026-11-22 by D-009; file contents unchanged.
+
+### D-009 — The panel sits at the repository root
+
+Proposed by the owner on 2026-11-22 (Asia/Shanghai): make the panel repository
+the main repository, with `stage-app` as one directory under `apps/`. Tried on
+the branch `try/ui-at-root`.
+
+What changed: `index.html`, `main.cjs`, `package-win.cjs`, `package.json` and
+`.gitignore` moved from `apps/pens-ui/` to the root using `git mv` (renames
+recorded, contents unchanged); the panel notes became `docs/UI.md`; the root
+README now documents the layout and how to run the panel.
+
+Why this layout: the panel is the one human-facing surface and the thing a
+person starts, so it is the repository's front door; applications are
+installable units and stay under `apps/`. `apps/stage-app/` already followed
+that rule and is untouched by this move.
+
+What this does not settle:
+
+- The desktop-shell question (D-001, D-005). The Electron runner is still an
+  unratified way to run the UI, not a chosen shell.
+- The PENS runtime, PEN package format and agent integration still do not exist.
+  Nothing here is a package, and the panel does not load `apps/stage-app/`.
+- Where a future runtime, SDK or core lives. A root-level panel frees `apps/`
+  for applications but does not decide `core/` or `sdk/`.
+- Whether the panel should stay at the root once a runtime exists.
+
 ## Proposed technical direction
 
 These recommendations are retained for the next design discussion. They are

@@ -12,12 +12,34 @@ VIVY is a prospective consumer alongside other agents.
 
 ## Project status
 
-**Decisions, repository bootstrap, and the first application sources.** No
-PENS runtime, application package format, SDK, desktop shell, or agent
-integration has been implemented or tested here.
+**Decisions, repository bootstrap, the panel source, and the first application
+source.** No PENS runtime, application package format, SDK, desktop shell, or
+agent integration has been implemented or tested here.
 
 - [Founding decisions and open questions](docs/DECISIONS.md)
 - [Historical research and source provenance](docs/REFERENCES.md)
+- [The panel: what it is and what is still missing](docs/UI.md)
+
+## Layout
+
+- `index.html`, `main.cjs`, `package-win.cjs`, `package.json` — the PENS panel,
+  at the repository root since [D-009](docs/DECISIONS.md). One self-contained
+  HTML launcher plus a minimal Electron runner.
+- `apps/stage-app/` — an application: the Live2D character stage.
+- `apps/<name>/` — home for further applications; the location is reversible.
+- `docs/` — decisions, provenance, and panel notes.
+
+## Running the panel
+
+```
+npm install
+npm start            # electron .
+npm run package:win  # writes dist/PENS-win32-x64/ and a zip
+```
+
+The panel is UI only: no PENS runtime, no PEN package, no agent integration, and
+nothing wired to `apps/stage-app/`. The Electron runner exists to run the
+current UI; it does not settle the desktop-shell question.
 
 ## Applications
 
@@ -26,12 +48,6 @@ integration has been implemented or tested here.
   with its commit history. It is a standalone presentation process with a
   token-guarded local HTTP API. It is not packaged as a PEN yet, and no PENS
   runtime loads it. See [D-007](docs/DECISIONS.md).
-- `apps/pens-ui/` — the PENS desktop surface, imported on 2026-11-22 from the
-  owner's Open Design export: one self-contained HTML launcher (four pages,
-  sixteen entries) and a minimal Electron 45.4.1 runner. UI only: no PEN
-  package, no runtime, no agent integration, and nothing wired to the stage.
-  The wrapper does not settle the desktop-shell question. See
-  [D-008](docs/DECISIONS.md).
 
 ## Product direction
 
