@@ -1,6 +1,20 @@
-const { app, BrowserWindow, dialog, Menu } = require('electron');
+const { app, BrowserWindow, dialog, Menu, ipcMain } = require('electron')
+const path = require('node:path')
+const fs = require('node:fs')
+const { stopStage, STAGE_DIR } = require('./stage-session.cjs')
+const { registerStageIpc, setModelsDir } = require('./stage-window.cjs')
 
-async function openDemoWindow() {
+/** 模型：环境变量优先，其次 stage-app 自己的 models/，都没有就让舞台自己报缺。 */
+function modelsDir() {
+  if (process.env.PENS_STAGE_MODELS) return process.env.PENS_STAGE_MODELS
+  const local = path.join(STAGE_DIR, 'models')
+  return fs.existsSync(local) ? local : undefined
+}
+
+setModelsDir(modelsDir)
+registerStageIpc(ipcMain)
+
+async function openPanelWindow() {
   const window = new BrowserWindow({
     title: 'PENS',
     width: 1280,
@@ -10,6 +24,7 @@ async function openDemoWindow() {
     backgroundColor: '#e8f3fa',
     show: false,
     webPreferences: {
+      preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -26,15 +41,16 @@ async function openDemoWindow() {
   });
 
   window.once('ready-to-show', () => window.show());
-  await window.loadFile('index.html');
+  await window.loadFile(path.join(__dirname, 'index.html'));
 }
 
 app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
-  return openDemoWindow();
+  return openPanelWindow();
 }).catch((error) => {
   dialog.showErrorBox('PENS 启动失败', error.message);
   app.exit(1);
 });
 
+app.on('before-quit', () => stopStage())
 app.on('window-all-closed', () => app.quit());
