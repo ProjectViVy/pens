@@ -1,0 +1,10 @@
+const { app, BrowserWindow } = require("electron")
+const fs = require("node:fs")
+const log = (m) => fs.appendFileSync("C:/Users/Administrator/Desktop/diva-dsh/.artifacts/smoke2.log", m + "\n")
+log("module")
+app.whenReady().then(() => {
+  log("ready")
+  const w = new BrowserWindow({ show: true, width: 400, height: 300 })
+  log("window " + w.id)
+  setTimeout(() => { log("quitting"); app.exit(0) }, 1500)
+}).catch((e) => { log("fail " + e.message); app.exit(3) })
