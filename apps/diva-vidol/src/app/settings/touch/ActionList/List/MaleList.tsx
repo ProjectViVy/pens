@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import Header from '@/components/Header';
 import { configSelectors, useSettingStore } from '@/store/setting';
-import { GenderEnum } from '@/types/agent';
+import { GenderEnum } from '@/types/character';
 import { TouchAreaEnum } from '@/types/touch';
 
 import AddOrEdit from '../Actions/AddOrEdit';

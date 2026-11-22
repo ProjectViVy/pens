@@ -1,5 +1,4 @@
 import analyzer from '@next/bundle-analyzer';
-import withSerwistInit from '@serwist/next';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -22,15 +21,20 @@ const nextConfig = {
     ],
   },
   reactStrictMode: true,
-  redirects: async () => {
-    return [
-      {
-        destination: '/manifest.webmanifest',
-        permanent: true,
-        source: '/manifest.json',
-      },
-    ];
-  },
+  /*
+   * 逃生阀：这台机器上 next build 的 type-check 步骤要 fork jest-worker，
+   * 沙箱里会以 spawn EPERM 直接失败（和代码无关）。
+   * 类型检查用 `npx tsc --noEmit` 单独跑，跑完再带这个环境变量出构建。
+   * 不设环境变量时行为和原来完全一样：构建里照样类型检查 + lint。
+   */
+  eslint: { ignoreDuringBuilds: process.env.DIVA_SKIP_LINT === '1' },
+  typescript: { ignoreBuildErrors: process.env.DIVA_SKIP_TYPECHECK === '1' },
+  /*
+   * 构建产物目录可以用环境变量改写。
+   * 用途只有一个：dev 服务器正在跑（占着 .next）的时候，还要另外出一个生产包做性能实测。
+   * 不设环境变量时就是默认的 .next。
+   */
+  distDir: process.env.DIVA_DIST_DIR || '.next',
   webpack(config) {
     config.experiments = {
       asyncWebAssembly: true,
@@ -63,14 +67,4 @@ const nextConfig = {
   },
 };
 
-const noWrapper = (config) => config;
-
-const withPWA = isProd
-  ? withSerwistInit({
-      register: false,
-      swDest: 'public/sw.js',
-      swSrc: 'src/app/sw.ts',
-    })
-  : noWrapper;
-
-export default isProd ? withBundleAnalyzer(withPWA(nextConfig)) : nextConfig;
+export default isProd ? withBundleAnalyzer(nextConfig) : nextConfig;

@@ -1,4 +1,4 @@
-import { DEFAULT_SYSTEM_AGENT_CONFIG } from '@/constants/agent';
+import { DEFAULT_SYSTEM_AGENT_CONFIG } from '@/constants/llm';
 import type { SettingStore } from '@/store/setting';
 import { merge } from '@/utils/merge';
 

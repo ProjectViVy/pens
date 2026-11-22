@@ -16,7 +16,7 @@ import { StateCreator } from 'zustand/vanilla';
 import { ModelProvider } from '@/libs/agent-runtime/types/type';
 import { ModelListAction, createModelListSlice } from '@/store/setting/slices/modelList';
 import createTouchStore, { TouchStore } from '@/store/setting/slices/touch';
-import { SystemAgentConfigKey, SystemAgentItem } from '@/types/agent';
+import { SystemAgentConfigKey, SystemAgentItem } from '@/types/settings';
 import { BackgroundEffect, Config } from '@/types/config';
 import { LocaleMode } from '@/types/locale';
 import { mergeWithUndefined } from '@/utils/common';

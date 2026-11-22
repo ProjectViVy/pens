@@ -1,21 +1,11 @@
-import { chainEmotionAnalysis } from '@/chains/emotionAnalysis';
 import { DEFAULT_MODEL_PROVIDER_LIST } from '@/config/modelProviders';
-import { DEFAULT_CHAT_MODEL, DEFAULT_CHAT_PROVIDER } from '@/constants/agent';
+import { DEFAULT_CHAT_MODEL, DEFAULT_CHAT_PROVIDER } from '@/constants/llm';
 import { AgentRuntime, ChatCompletionErrorPayload, ModelProvider } from '@/libs/agent-runtime';
-import { AudioPlayer } from '@/libs/audio/AudioPlayer';
-import { MotionPresetName } from '@/libs/emoteController/motionPresetMap';
-import { speakCharacter } from '@/libs/messages/speakCharacter';
-import { speakChatItem } from '@/libs/messages/speakChatItem';
-import { SpeakAudioOptions } from '@/libs/messages/type';
-import { useGlobalStore } from '@/store/global';
-import { sessionSelectors, useSessionStore } from '@/store/session';
 import { useSettingStore } from '@/store/setting';
-import { systemAgentSelectors } from '@/store/setting/selectors';
 import { modelConfigSelectors } from '@/store/setting/selectors/modelConfig';
 import { modelProviderSelectors } from '@/store/setting/selectors/modelProvider';
 import { ChatErrorType } from '@/types/fetch';
 import { ChatStreamPayload } from '@/types/provider/chat';
-import { ExpressionType } from '@/types/touch';
 import { createErrorResponse } from '@/utils/errorResponse';
 import { FetchSSEOptions, fetchSSE } from '@/utils/fetch';
 
@@ -286,106 +276,3 @@ export const fetchPresetTaskResult = async ({
   }
 };
 
-/**
- * 情感分析, 添加情绪类别，然后类似触摸响应播放表情和动作
- * @param message - 文本
- * @returns 表情和动作
- */
-export const analyzeEmotion = async (message: string) => {
-  // 获取系统代理情感分析模型配置
-  const systemAgentForEmotionAnalysis = systemAgentSelectors.emotionAnalysis(
-    useSettingStore.getState(),
-  );
-  // 进行情感分析
-  const { messages } = chainEmotionAnalysis(message);
-
-  let expression: ExpressionType = 'aa';
-  let motion: MotionPresetName = MotionPresetName.Idle;
-
-  await fetchPresetTaskResult({
-    params: {
-      ...systemAgentForEmotionAnalysis,
-      messages,
-      stream: false,
-    },
-    onMessageHandle: async (chunk) => {
-      if (chunk.type === 'text') {
-        try {
-          const result = JSON.parse(chunk.text);
-          expression = result.expression;
-          motion = result.motion;
-        } catch (e) {
-          console.error('情感分析结果解析失败:', e);
-        }
-      }
-    },
-  });
-
-  return { expression, motion };
-};
-
-/**
- * 情感分析, 播放表情和动作
- * @param message - 文本
- * @param options - 语音选项
- * @returns 表情和动作
- */
-export const handleEmotionSpeak = async (message: string, options?: SpeakAudioOptions) => {
-  const chatMode = useGlobalStore.getState().chatMode;
-  const currentAgent = sessionSelectors.currentAgent(useSessionStore.getState());
-  const tts = { ...currentAgent?.tts, message };
-
-  if (chatMode === 'camera') {
-    const viewer = useGlobalStore.getState().viewer;
-    const { expression, motion } = await analyzeEmotion(message);
-    await speakCharacter(
-      {
-        expression,
-        motion,
-        tts,
-      },
-      viewer,
-      {
-        ...options,
-        onComplete: () => {
-          options?.onComplete?.();
-          viewer.resetToIdle();
-        },
-      },
-    );
-  } else {
-    await speakChatItem(tts, options);
-  }
-};
-
-export const handleSpeakAi = async (message: string, options?: SpeakAudioOptions) => {
-  const chatMode = useGlobalStore.getState().chatMode;
-  const currentAgent = sessionSelectors.currentAgent(useSessionStore.getState());
-  const tts = { ...currentAgent?.tts, message };
-
-  if (chatMode === 'camera') {
-    const viewer = useGlobalStore.getState().viewer;
-    await speakCharacter(
-      {
-        expression: 'aa',
-        tts,
-      },
-      viewer,
-      options,
-    );
-  } else {
-    await speakChatItem(tts, options);
-  }
-};
-
-export const handleStopSpeak = async () => {
-  const viewer = useGlobalStore.getState().viewer;
-  const chatMode = useGlobalStore.getState().chatMode;
-
-  if (chatMode === 'camera') {
-    viewer.model?.stopSpeak();
-  } else {
-    const audioPlayer = AudioPlayer.getInstance();
-    audioPlayer.stop();
-  }
-};

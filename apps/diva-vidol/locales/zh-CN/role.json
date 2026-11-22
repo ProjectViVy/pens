@@ -128,10 +128,11 @@
     "customEnable": "启用自定义触摸",
     "area": {
       "head": "头部",
-      "arm": "手臂",
-      "leg": "腿部",
-      "chest": "胸部",
-      "belly": "腹部",
+      "chest": "上半身",
+      "belly": "肚子",
+      "arm": "手和手臂",
+      "leg": "腿",
+      "foot": "脚",
       "buttocks": "臀部"
     },
     "expression": {

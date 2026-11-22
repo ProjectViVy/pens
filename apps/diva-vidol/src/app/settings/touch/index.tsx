@@ -47,6 +47,14 @@ const Touch = (props: TouchProps) => {
       value: TouchAreaEnum.Head,
     },
     {
+      label: t('touch.area.chest', { ns: 'role' }),
+      value: TouchAreaEnum.Chest,
+    },
+    {
+      label: t('touch.area.belly', { ns: 'role' }),
+      value: TouchAreaEnum.Belly,
+    },
+    {
       label: t('touch.area.arm', { ns: 'role' }),
       value: TouchAreaEnum.Arm,
     },
@@ -55,12 +63,8 @@ const Touch = (props: TouchProps) => {
       value: TouchAreaEnum.Leg,
     },
     {
-      label: t('touch.area.chest', { ns: 'role' }),
-      value: TouchAreaEnum.Chest,
-    },
-    {
-      label: t('touch.area.belly', { ns: 'role' }),
-      value: TouchAreaEnum.Belly,
+      label: t('touch.area.foot', { ns: 'role' }),
+      value: TouchAreaEnum.Foot,
     },
     {
       label: t('touch.area.buttocks', { ns: 'role' }),

@@ -143,6 +143,16 @@ export const DEFAULT_TOUCH_ACTION_CONFIG_FEMALE: TouchActionConfig = {
       motion: MotionPresetName.FemaleCoverUndies,
     },
   ],
+  // 脚：素材里没有「被踩到脚」这种片段，用摇头（「别踩」）+ 惊讶顶一下。
+  // 用真实片段（clipId）而不是旧预设，这样设置里换片段时和动作面板是同一套素材。
+  [TouchAreaEnum.Foot]: [
+    {
+      expression: VRMExpressionPresetName.Surprised,
+      text: '别踩别踩——',
+      clipId: 'shake',
+      clipLoop: false,
+    },
+  ],
 };
 
 export const DEFAULT_TOUCH_ACTION_CONFIG_MALE: TouchActionConfig = {
@@ -238,12 +248,21 @@ export const DEFAULT_TOUCH_ACTION_CONFIG_MALE: TouchActionConfig = {
       motion: MotionPresetName.MaleAngry,
     },
   ],
+  [TouchAreaEnum.Foot]: [
+    {
+      expression: VRMExpressionPresetName.Neutral,
+      text: '别踩别踩——',
+      clipId: 'shake',
+      clipLoop: false,
+    },
+  ],
 };
 
 export const EMPTY_TOUCH_CONFIG: TouchActionConfig = {
   [TouchAreaEnum.Head]: [],
   [TouchAreaEnum.Arm]: [],
   [TouchAreaEnum.Leg]: [],
+  [TouchAreaEnum.Foot]: [],
   [TouchAreaEnum.Chest]: [],
   [TouchAreaEnum.Belly]: [],
   [TouchAreaEnum.Buttocks]: [],

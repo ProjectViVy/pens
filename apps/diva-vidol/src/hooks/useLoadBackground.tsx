@@ -6,18 +6,18 @@ import { fetchWithProgress } from '@/utils/fetch';
 import { getBackgroundPathById } from '@/utils/file';
 import { cacheStorage } from '@/utils/storage';
 
+// 本地素材线：背景图直接走项目内的 `/assets/...`，不再拼 r2.vidol.chat
+const resolveBackgroundPath = (path: string) =>
+  path.startsWith('/') || /^https?:\/\//.test(path) ? path : `/assets/backgrounds/${encodeURIComponent(path)}`;
+
 const getBackgroundUrlById = (backgroundId: string) => {
   const background = backgroundOptions.find((item) => item.id === backgroundId);
-  return background
-    ? `https://r2.vidol.chat/backgrounds/${encodeURIComponent(background.url)}`
-    : undefined;
+  return background ? resolveBackgroundPath(background.url) : undefined;
 };
 
 const getBackgroundThumbById = (backgroundId: string) => {
   const background = backgroundOptions.find((item) => item.id === backgroundId);
-  return background
-    ? `https://r2.vidol.chat/backgrounds/${encodeURIComponent(background.thumbnail)}`
-    : undefined;
+  return background ? resolveBackgroundPath(background.thumbnail) : undefined;
 };
 
 export const useLoadBackground = () => {

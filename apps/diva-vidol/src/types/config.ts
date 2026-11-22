@@ -1,6 +1,7 @@
 import { NeutralColors, PrimaryColors } from '@lobehub/ui';
 
-import { GenderEnum, SystemAgentConfig } from '@/types/agent';
+import { GenderEnum } from '@/types/character';
+import { SystemAgentConfig } from '@/types/settings';
 import { LocaleMode } from '@/types/locale';
 import { TouchActionConfig } from '@/types/touch';
 

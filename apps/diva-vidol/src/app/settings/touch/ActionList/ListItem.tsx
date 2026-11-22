@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import React, { memo } from 'react';
 
 import ListItem from '@/components/ListItem';
-import { GenderEnum } from '@/types/agent';
+import { GenderEnum } from '@/types/character';
 import { TouchAction, TouchAreaEnum } from '@/types/touch';
 
 import AddOrEdit from './Actions/AddOrEdit';

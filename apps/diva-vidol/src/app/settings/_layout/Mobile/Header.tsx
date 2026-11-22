@@ -11,7 +11,8 @@ import { mobileHeaderSticky } from '@/styles/mobileHeader';
 import { useActiveSettingsKey } from '../../hooks/useActiveSettingsKey';
 
 const Header = memo(() => {
-  const { t } = useTranslation('setting');
+  // 命名空间是 settings（复数），写成 setting 会取不到文案，标题会直接露出 tab.xxx
+  const { t } = useTranslation('settings');
 
   const router = useRouter();
   const activeSettingsKey = useActiveSettingsKey();

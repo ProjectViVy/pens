@@ -5,7 +5,7 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useSettingStore } from '@/store/setting';
-import { GenderEnum } from '@/types/agent';
+import { GenderEnum } from '@/types/character';
 import { TouchAreaEnum } from '@/types/touch';
 
 interface Props {

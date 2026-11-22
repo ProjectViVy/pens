@@ -8,6 +8,7 @@ import { ChatMode } from '@/types/session';
 const viewer = new Viewer();
 
 export enum SettingsTabs {
+  About = 'about',
   Common = 'common',
   LLM = 'llm',
   TTS = 'tts',
@@ -17,19 +18,16 @@ export enum SettingsTabs {
 export interface GlobalStore {
   backgroundUrl: string | undefined;
   chatMode: ChatMode;
-  hidePWAInstaller: boolean;
   isPlaying: boolean;
   setBackgroundUrl: (url: string | undefined) => void;
   setChatDialog: (show: boolean) => void;
   setChatMode: (mode: ChatMode) => void;
   setChatSidebar: (show: boolean) => void;
-  setHidePWAInstaller: (hide: boolean) => void;
   setIsPlaying: (isPlaying: boolean) => void;
   setRoleList: (show: boolean) => void;
   setSessionList: (show: boolean) => void;
   setShowAgentInfo: (show: boolean) => void;
   setThemeMode: (themeMode: ThemeMode) => void;
-  setVoiceOn: (voiceOn: boolean) => void;
   showAgentInfo: boolean;
   showChatDialog: boolean;
   showChatSidebar: boolean;
@@ -43,20 +41,17 @@ export interface GlobalStore {
   toggleSessionList: () => void;
 
   viewer: Viewer;
-  voiceOn: boolean;
 }
 
 const initialState = {
   viewer,
   themeMode: 'auto' as ThemeMode,
   chatMode: 'chat' as ChatMode,
-  voiceOn: false,
   isPlaying: false,
   showChatSidebar: false,
   showAgentInfo: true,
   showSessionList: true,
   showChatDialog: true,
-  hidePWAInstaller: false,
   showRoleList: true,
   backgroundUrl: undefined,
 };
@@ -65,9 +60,6 @@ export const useGlobalStore = createWithEqualityFn<GlobalStore>()(
     ...initialState,
     setIsPlaying: (isPlaying: boolean) => {
       set({ isPlaying: isPlaying });
-    },
-    setHidePWAInstaller: (hide: boolean) => {
-      set({ hidePWAInstaller: hide });
     },
     setBackgroundUrl: (url: string | undefined) => {
       set({ backgroundUrl: url });
@@ -107,9 +99,6 @@ export const useGlobalStore = createWithEqualityFn<GlobalStore>()(
     },
     toggleChatDialog: () => {
       set((state) => ({ showChatDialog: !state.showChatDialog }));
-    },
-    setVoiceOn: (voiceOn) => {
-      set({ voiceOn });
     },
   }),
   shallow,

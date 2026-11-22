@@ -1,7 +1,7 @@
 import { VRMExpressionPresetName } from '@pixiv/three-vrm';
 
 import { MotionPresetName } from '@/libs/emoteController/motionPresetMap';
-import { GenderEnum } from '@/types/agent';
+import { GenderEnum } from '@/types/character';
 
 import { TTS } from './tts';
 
@@ -12,12 +12,22 @@ export type ExpressionType = VRMExpressionPresetName;
 
 /**
  * 触摸区域枚举
+ *
+ * 和骨骼的对应关系见 `Model.mapBoneNameToTouchArea`：
+ * - head：头/颈/眼/下颌（头还有独立的点击盒）
+ * - chest：胸（含 upperChest）——「上半身」
+ * - belly：spine + hips 之间的肚子（spine 落这里）
+ * - arm：上臂/前臂/手——「手和手臂」
+ * - leg：大腿/小腿
+ * - foot：脚掌/脚趾
+ * - buttocks：hips
  */
 export enum TouchAreaEnum {
   Arm = 'arm',
   Belly = 'belly',
   Buttocks = 'buttocks',
   Chest = 'chest',
+  Foot = 'foot',
   Head = 'head',
   Leg = 'leg',
 }
@@ -27,11 +37,19 @@ export enum TouchAreaEnum {
  */
 export interface TouchAction {
   /**
+   * 动作库片段 id（`public/vrma/index.json` 里的 151 个真实片段，如 `world-nod`）。
+   *
+   * 和 `motion` 二选一：给了 `clipId` 就直接播这个片段，不再走预设映射。
+   */
+  clipId?: string;
+  /** 片段本身是否循环（循环片段播几秒后由世界那套收回待机） */
+  clipLoop?: boolean;
+  /**
    * 表情
    */
   expression: ExpressionType;
   /**
-   * 动作（可选）
+   * 动作（旧预设，17 个）
    */
   motion?: MotionPresetName;
   /**
@@ -107,6 +125,7 @@ export interface TouchActionConfig {
   [TouchAreaEnum.Head]: TouchAction[];
   [TouchAreaEnum.Arm]: TouchAction[];
   [TouchAreaEnum.Leg]: TouchAction[];
+  [TouchAreaEnum.Foot]: TouchAction[];
   [TouchAreaEnum.Chest]: TouchAction[];
   [TouchAreaEnum.Belly]: TouchAction[];
   [TouchAreaEnum.Buttocks]: TouchAction[];

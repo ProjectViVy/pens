@@ -6,7 +6,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ClearCache from '@/features/Actions/ClearCache';
-import ClearSession from '@/features/Actions/ClearSession';
 import ResetConfig from '@/features/Actions/ResetConfig';
 
 import AvatarWithUpload from './AvatarWithUpload';
@@ -94,13 +93,6 @@ const CommonConfig = (props: CommonConfigProps) => {
           </FormItem>
         </FormGroup>
         <FormGroup icon={Monitor} title={t('common.system.title')}>
-          <FormItem
-            desc={t('common.system.clear.desc')}
-            divider
-            label={t('common.system.clear.title')}
-          >
-            <ClearSession />
-          </FormItem>
           <FormItem
             desc={t('common.system.reset.desc')}
             divider

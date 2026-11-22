@@ -6,14 +6,17 @@ import {
   VRMUtils,
 } from '@pixiv/three-vrm';
 import * as THREE from 'three';
+import { Vector3 } from 'three';
 import { GLTFLoader, GLTFParser } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import { VRMLookAtSmootherLoaderPlugin } from '@/libs/VRMLookAtSmootherLoaderPlugin/VRMLookAtSmootherLoaderPlugin';
 import { EmoteController } from '@/libs/emoteController/emoteController';
+import { StageHands } from '@/libs/emoteController/stageHands';
 import { LipSync } from '@/libs/lipSync/lipSync';
 import { Screenplay, TouchAreaEnum } from '@/types/touch';
 
-import { MotionPresetName } from '../emoteController/motionPresetMap';
+import { IDLE_MOTION_URL, MotionPresetName } from '../emoteController/motionPresetMap';
+import { posturePresetMap } from '../emoteController/posturePresets';
 import { MotionFileType } from '../emoteController/type';
 
 /**
@@ -21,6 +24,8 @@ import { MotionFileType } from '../emoteController/type';
  */
 export class Model {
   public vrm?: VRM | null;
+  /** 走位用的外壳：模型套在里面，只负责位置与朝向 */
+  public navRoot: THREE.Object3D | null = null;
   public emoteController?: EmoteController;
   public speaking: boolean = false; // 是否正在说话
 
@@ -58,6 +63,20 @@ export class Model {
 
     VRMUtils.rotateVRM0(vrm);
 
+    // 搬过来的 Hanami 片段是按「朝 -Z」制作的（Overte 的朝向），而 lobe 这边的
+    // 走位/落座/取景全都按「rotation.y 0 = 朝 +Z」算。两边差 180°，所以给模型套一层
+    // 只负责转正的外壳：外壳承载走位与转身，里面这 180° 抵消片段的朝向。
+    // 不这样做的话待机时永远是背影（实测 idle / raise-hand 都是背对镜头）。
+    const root = new THREE.Object3D();
+    root.name = 'ModelRoot';
+    root.add(vrm.scene);
+    vrm.scene.rotation.y = Math.PI;
+    this.navRoot = root;
+
+    // 手指静息姿势必须写在任何动作播放之前：mixer 会把那一刻的骨骼值当作原值缓存。
+    // idle / world-walk / world-sit-idle 这些最常看的片段都没有手指轨道。
+    new StageHands(vrm).applyRestPose();
+
     this.emoteController = new EmoteController(vrm, this._lookAtTargetParent);
 
     // 在这里调用 createHeadHitbox
@@ -75,7 +94,71 @@ export class Model {
     this.emoteController?.playMotionUrl(fileType, url, loop);
   }
 
+  /**
+   * 视线：不传点就看回镜头，传了点就看那个位置。
+   * 转的是脖子和头（StageGaze 在 mixer 之后叠加），不是只动眼珠。
+   */
+  public lookAt(point?: { x: number; y?: number; z: number }) {
+    const gaze = this.emoteController?.gaze;
+    if (!gaze) return;
+    if (point) {
+      gaze.lookAt(new Vector3(point.x, point.y ?? 1.2, point.z));
+      return;
+    }
+    gaze.lookAtCamera();
+  }
+
+  /** 房间地面高度（贴地层对齐用） */
+  public setGroundY(y: number) {
+    if (this.emoteController?.ground) this.emoteController.ground.groundY = y;
+    if (this.emoteController?.legIk) this.emoteController.legIk.groundY = y;
+  }
+
+  /** 站着不动的时候打开逐腿 IK（走路/坐着时关掉，脚该由片段驱动） */
+  /**
+   * 足底 IK 的开关。
+   *
+   * walking=true 时切成「只防穿地」：走路片段的摆动相本来就把脚抬起来了，
+   * 那时把脚拽回地面会变成拖脚。站着不动时才做完整解。
+   */
+  public setFootPlanting(enabled: boolean, walking = false) {
+    const legIk = this.emoteController?.legIk;
+    if (!legIk) return;
+    // 走位期间整条腿一条都不解。
+    // 以前是「走路时只防穿地」（penetrationOnly）：只要摆动腿的脚在某一帧落到地面以下，
+    // IK 就把整条腿掰到够得着地面——实测大腿被掰到离竖直 106°（越过水平线、朝后甩），
+    // 小腿却还是垂直向下，看上去就是马的后腿，也就是「半人马」。
+    // 走路片段自己的落脚高度本来就是对的，地面又是平的（贴在 room.ground 上），不需要 IK 兜底。
+    legIk.enabled = enabled && !walking;
+    legIk.penetrationOnly = false;
+  }
+
+  /** 坐着的时候，贴地只做极轻微修正（脚可能本来就够不着地） */
+  public setSeated(seated: boolean, seatY?: number) {
+    const ground = this.emoteController?.ground;
+    if (!ground) return;
+    ground.seated = seated;
+    ground.seatY = seated ? seatY : undefined;
+  }
+
+  /** 一次性动作是否正在播（待机轮换用） */
+  public get isOneShotPlaying() {
+    return Boolean(this.emoteController?.isOneShotPlaying);
+  }
+
+  /** 模型的静止髋高（米）：动作片段的时间/速度是按髋高归一的，换算真实速度要用它 */
+  public hipsHeight(): number {
+    const rest = this.vrm?.humanoid.normalizedRestPose?.hips?.position;
+    return rest?.[1] ?? 0;
+  }
+
   public async loadIdleAnimation() {
+    // 一次性动作播完自动回到这个片段（Hanami 的 Overte 待机，不再是占位）
+    this.emoteController?.setIdleUrl(IDLE_MOTION_URL);
+    // 走位途中不许抢片段。模型/房间加载完成、触摸反应结束都会调到这里，
+    // 而它们经常正好落在一次走位中间——硬切 idle 的结果就是「人还在往前滑、
+    // 姿态却是站着不动」（实测 [clip] idle 紧跟在 world-walk 之后）。
+    if (this.emoteController?.isWalkHeld) return;
     this.emoteController?.playEmotion(VRMExpressionPresetName.Neutral);
     this.emoteController?.playMotion(MotionPresetName.Idle, true);
   }
@@ -90,7 +173,7 @@ export class Model {
     // 播放人物表情
     this.emoteController?.playEmotion(screenplay.expression);
     // 播放人物动作
-    if (screenplay.motion) this.emoteController?.playMotion(screenplay.motion, true);
+    if (screenplay.motion) this.emoteController?.playMotion(screenplay.motion);
     // 唇形同步
     await new Promise((resolve) => {
       this._lipSync?.playFromArrayBuffer(buffer, () => {
@@ -98,6 +181,17 @@ export class Model {
       });
     });
     this.speaking = false;
+  }
+
+  /**
+   * 无声表演：只播表情与动作，不需要音频
+   *
+   * 拆线后本地环境没有可用的语音合成（edge TTS 的 WebSocket 连不上），
+   * 触摸反应退化成纯表情/动作。
+   */
+  public playScreenplay(screenplay: Pick<Screenplay, 'expression' | 'motion'>) {
+    this.emoteController?.playEmotion(screenplay.expression);
+    if (screenplay.motion) this.emoteController?.playMotion(screenplay.motion);
   }
 
   /**
@@ -136,6 +230,32 @@ export class Model {
 
   public async preloadMotionUrl(fileType: MotionFileType, url: string) {
     await this.emoteController?.preloadMotionUrl(fileType, url);
+  }
+
+  /**
+   * 应用一个静态姿势预设（纯程序化骨骼姿势，不依赖素材文件）
+   *
+   * @param id `posturePresetMap` 里的预设 id，例如 `handsOnHips` / `sit`
+   */
+  public applyPosture(id: string) {
+    const preset = posturePresetMap[id];
+
+    if (!preset) {
+      console.warn(`未知的姿势预设: ${id}`);
+      return;
+    }
+
+    this.emoteController?.applyPosture(preset);
+  }
+
+  /** 清除姿势：骨骼归零并回到待机 idle */
+  public clearPosture() {
+    this.emoteController?.clearPosture();
+  }
+
+  /** 当前生效的静态姿势 id，姿势面板用它恢复卡片高亮 */
+  public get currentPostureId(): string | undefined {
+    return this.emoteController?.currentPostureId;
   }
 
   public createHeadHitbox() {
@@ -185,6 +305,7 @@ export class Model {
 
     const mainBones: VRMHumanBoneName[] = [
       ...this.getHeadBones(),
+      VRMHumanBoneName.UpperChest,
       VRMHumanBoneName.Chest,
       VRMHumanBoneName.Spine,
       VRMHumanBoneName.Hips,
@@ -197,9 +318,11 @@ export class Model {
       VRMHumanBoneName.LeftUpperLeg,
       VRMHumanBoneName.LeftLowerLeg,
       VRMHumanBoneName.LeftFoot,
+      VRMHumanBoneName.LeftToes,
       VRMHumanBoneName.RightUpperLeg,
       VRMHumanBoneName.RightLowerLeg,
       VRMHumanBoneName.RightFoot,
+      VRMHumanBoneName.RightToes,
     ];
 
     const getBoneWeight = (boneName: VRMHumanBoneName): number => {
@@ -210,6 +333,7 @@ export class Model {
         case VRMHumanBoneName.Jaw:
           return 2; // 增加头部相关骨骼的权重
         case VRMHumanBoneName.Chest:
+        case VRMHumanBoneName.UpperChest:
         case VRMHumanBoneName.Spine:
         case VRMHumanBoneName.Hips:
           return 1.5;
@@ -241,6 +365,13 @@ export class Model {
     return closestBone;
   }
 
+  /**
+   * 骨骼 → 触摸区域。
+   *
+   * 划分是按「用户能指着说的部位」来的：头 / 上半身（chest）/ 肚子（spine）/
+   * 手和手臂 / 腿 / 脚 / 臀部（hips）。脚以前并进腿里，点脚背和点小腿没区别；
+   * 现在脚掌和脚趾单独算一个区域。
+   */
   public mapBoneNameToTouchArea(boneName: VRMHumanBoneName): TouchAreaEnum | null {
     const headBones = this.getHeadBones();
     if (headBones.includes(boneName)) {
@@ -257,13 +388,19 @@ export class Model {
         return TouchAreaEnum.Arm;
 
       case VRMHumanBoneName.LeftUpperLeg:
-      case VRMHumanBoneName.RightUpperLeg:
       case VRMHumanBoneName.LeftLowerLeg:
+      case VRMHumanBoneName.RightUpperLeg:
       case VRMHumanBoneName.RightLowerLeg:
-      case VRMHumanBoneName.LeftFoot:
-      case VRMHumanBoneName.RightFoot:
         return TouchAreaEnum.Leg;
 
+      case VRMHumanBoneName.LeftFoot:
+      case VRMHumanBoneName.LeftToes:
+      case VRMHumanBoneName.RightFoot:
+      case VRMHumanBoneName.RightToes:
+        return TouchAreaEnum.Foot;
+
+      // upperChest 是「上半身」真正的骨，之前没映射，点锁骨一带什么都不触发
+      case VRMHumanBoneName.UpperChest:
       case VRMHumanBoneName.Chest:
         return TouchAreaEnum.Chest;
 
@@ -324,3 +461,13 @@ export class Model {
 
   // ... 其他现有的方法 ...
 }
+
+
+
+
+
+
+
+
+
+

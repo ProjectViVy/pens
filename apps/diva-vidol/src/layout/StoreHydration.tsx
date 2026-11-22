@@ -3,10 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { memo, useEffect } from 'react';
 
-// import { ModelProvider } from '@/libs/agent-runtime/types';
-import { AGENT_STORAGE_KEY, useAgentStore } from '@/store/agent';
+import { CHARACTER_STORAGE_KEY, useCharacterStore } from '@/store/character';
 import { DANCE_STORAGE_KEY } from '@/store/dance';
-import { SESSION_STORAGE_KEY } from '@/store/session';
 import { SETTING_STORAGE_KEY, useSettingStore } from '@/store/setting';
 import { vidolStorage } from '@/utils/storage';
 
@@ -23,32 +21,35 @@ export const migrateLocalStorageToIndexedDB = async (storageKey: string) => {
 const migrate = async () => {
   // localstorage 迁移到 indexeddb 后，删除迁移标识
   if (localStorage.getItem(MIGRATION_KEY)) return;
-  await migrateLocalStorageToIndexedDB(AGENT_STORAGE_KEY);
-  await migrateLocalStorageToIndexedDB(SESSION_STORAGE_KEY);
+  await migrateLocalStorageToIndexedDB(CHARACTER_STORAGE_KEY);
   await migrateLocalStorageToIndexedDB(SETTING_STORAGE_KEY);
   await migrateLocalStorageToIndexedDB(DANCE_STORAGE_KEY);
   localStorage.setItem(MIGRATION_KEY, 'true');
 };
 
+/**
+ * 客户端水合
+ *
+ * agent / 会话两个 store 已删除，这里只负责：旧 localStorage 数据迁移到 IndexedDB、
+ * 人物 store 重新水合、语言模型列表刷新、两条路由预取。
+ */
 const StoreHydration = () => {
   const router = useRouter();
 
   const refreshDefaultModelProviderList = useSettingStore((s) => s.refreshDefaultModelProviderList);
 
   useEffect(() => {
-    // refs: https://github.com/pmndrs/zustand/blob/main/docs/integrations/persisting-store-data.md#hashydrated
     migrate().then(() => {
-      useAgentStore.persist.rehydrate();
+      useCharacterStore.persist.rehydrate();
     });
 
     refreshDefaultModelProviderList();
   }, []);
 
   useEffect(() => {
-    router.prefetch('/chat');
-    router.prefetch('/settings');
-    router.prefetch('/role');
-    router.prefetch('/discover');
+    // 只剩 舞台 / 设置 两个入口
+    router.prefetch('/');
+    router.prefetch('/settings/common');
   }, [router]);
 
   return null;

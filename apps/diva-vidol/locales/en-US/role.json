@@ -118,12 +118,13 @@
   "touch": {
     "addAction": "Add Response Action",
     "area": {
-      "arm": "Arm",
+      "arm": "Hands & Arms",
       "belly": "Belly",
-      "buttocks": "buttocks",
-      "chest": "Chest",
+      "buttocks": "Hips",
+      "chest": "Upper Body",
+      "foot": "Feet",
       "head": "Head",
-      "leg": "Leg"
+      "leg": "Legs"
     },
     "customEnable": "Enable Custom Touch",
     "editAction": "Edit Response Action",

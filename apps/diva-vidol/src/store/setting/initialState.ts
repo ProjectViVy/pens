@@ -30,12 +30,12 @@ import {
   ZhiPuProviderCard,
   filterEnabledModels,
 } from '@/config/modelProviders';
-import { DEFAULT_SYSTEM_AGENT_CONFIG } from '@/constants/agent';
+import { DEFAULT_SYSTEM_AGENT_CONFIG } from '@/constants/llm';
 import {
   DEFAULT_TOUCH_ACTION_CONFIG_FEMALE,
   DEFAULT_TOUCH_ACTION_CONFIG_MALE,
 } from '@/constants/touch';
-import { GenderEnum } from '@/types/agent';
+import { GenderEnum } from '@/types/character';
 import { Config } from '@/types/config';
 import { ModelProviderCard } from '@/types/llm';
 

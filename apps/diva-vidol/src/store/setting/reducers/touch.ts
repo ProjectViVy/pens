@@ -1,6 +1,6 @@
 import { produce } from 'immer';
 
-import { GenderEnum } from '@/types/agent';
+import { GenderEnum } from '@/types/character';
 import { TouchConfig } from '@/types/config';
 import { TouchAction, TouchAreaEnum } from '@/types/touch';
 

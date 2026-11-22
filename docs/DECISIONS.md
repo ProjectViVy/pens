@@ -224,6 +224,9 @@ Rollback: revert the one commit; no state or data format moved.
 
 ## D-012 — DivaVidol is the second application, imported as a snapshot
 
+> Superseded by D-013: the project imported here was the wrong one. The directory
+> and the panel entry survived; the contents became the VRM stage fork.
+
 Asked for on 2026-11-22 (Asia/Shanghai): 移植 lobe-vidol，加入数字人板块，取名 DivaVidol.
 
 What was done:
@@ -253,6 +256,39 @@ What this does not settle:
 - Model provider configuration. The app opens without a key; chatting needs
   one, set in the app or via environment variables.
 
+## D-013 — DivaVidol is the owner's VRM stage fork, not an upstream snapshot
+
+Corrected on 2026-11-22 (Asia/Shanghai): 项目好像传错了，…实际上应该传的是这个.
+
+What happened: D-012 imported `lobehub/lobe-vidol` as an unmodified snapshot. That
+was the wrong project. The application meant for the 数字人 page is the owner's own
+working copy at `Desktop\diva-stage-vrm` — a fork of lobe-vidol rewritten into a 3D
+classroom with a VRM character (396 files changed against upstream, +2908/−71998,
+PWA and the voice-list runtime removed, VRM stage modules added).
+
+What changed:
+
+- `apps/diva-vidol/` now holds that working tree instead of the upstream snapshot.
+  The history keeps the wrong import (it was already pushed; rewriting public
+  history was rejected in favour of an explicit removal commit).
+- Imported files are the source only: `node_modules`, `.next`, `.npm-cache`,
+  `.downloads`, `.perf-tmp`, `shots`, `scratch` and logs are excluded. The three
+  asset trees (`public/assets`, `public/environments`, `public/vrma`, ~246 MB) were
+  untracked in the source project too and stay untracked here; they are gitignored
+  and copied locally on this machine.
+- The entry, the window title and the directory keep the name DivaVidol given
+  earlier. The source project is called `diva-stage-vrm`; both names refer to the
+  same application.
+- Dependencies are the owner's installed tree, linked with a junction on this
+  machine, so nothing had to be re-downloaded; an independent copy needs
+  `npm install --legacy-peer-deps` for the reason recorded in D-012.
+
+What this does not settle:
+
+- Whether the app should run `next dev` (20–25 s cold start) or a production build.
+- Whether the 246 MB of VRM assets should get a downloader/`buildLocalAssets`
+  step for fresh machines, instead of manual copying.
+- Whether the conversation inside the app should stay a keyword placeholder.
 ## Proposed technical direction
 
 These recommendations are retained for the next design discussion. They are

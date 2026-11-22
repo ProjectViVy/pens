@@ -6,7 +6,6 @@ import { isRtlLang } from 'rtl-detect';
 import Analytics from '@/components/Analytics';
 import NProgress from '@/components/NProgress';
 import { DEFAULT_LANG, LOBE_LOCALE_COOKIE } from '@/constants/locale';
-import PWAInstall from '@/features/PWAInstall';
 import Layout from '@/layout';
 import { isMobileDevice } from '@/utils/server/responsive';
 
@@ -22,15 +21,12 @@ const RootLayout = async ({ children }: PropsWithChildren) => {
   const direction = isRtlLang(locale) ? 'rtl' : 'ltr';
   return (
     <html lang={locale} dir={direction} suppressHydrationWarning>
-      <head>
-        <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js" defer />
-      </head>
+      <head />
       <body>
         <StyleRegistry>
           {/* @ts-ignore */}
           <Layout>
             <NProgress />
-            <PWAInstall />
             {children}
           </Layout>
         </StyleRegistry>

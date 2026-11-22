@@ -3,7 +3,7 @@ import { t } from 'i18next';
 import { DEFAULT_LANG } from '@/constants/locale';
 import { Locales } from '@/locales/resources';
 import { SettingStore } from '@/store/setting';
-import { GenderEnum } from '@/types/agent';
+import { GenderEnum } from '@/types/character';
 import { Config, TTSConfig, TouchConfig } from '@/types/config';
 import {
   GlobalLLMProviderKey,

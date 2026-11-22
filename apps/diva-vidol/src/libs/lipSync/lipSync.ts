@@ -17,7 +17,9 @@ export class LipSync {
   }
 
   public update(): LipSyncAnalyzeResult {
-    this.analyser.getFloatTimeDomainData(this.timeDomainData);
+    // lib.dom 的类型要求 Float32Array<ArrayBuffer>，这里的数组来自 new Float32Array(n)，
+    // 运行时就是普通 ArrayBuffer，做一次窄化转换消除 TS 的 SharedArrayBuffer 分支报错
+    this.analyser.getFloatTimeDomainData(this.timeDomainData as Float32Array<ArrayBuffer>);
 
     let volume = 0;
     for (let i = 0; i < TIME_DOMAIN_DATA_LENGTH; i++) {

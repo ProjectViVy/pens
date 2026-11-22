@@ -1,8 +1,57 @@
 {
+  "about": {
+    "app": {
+      "desc": "3D 虚拟舞台 · MIT License",
+      "title": "应用信息"
+    },
+    "coffee": {
+      "action": "前往赞助",
+      "desc": "请作者喝一杯咖啡",
+      "title": "Ko-fi"
+    },
+    "community": {
+      "action": "加入 Discord",
+      "desc": "Discord 群组，和其他人一起讨论",
+      "title": "社区支持"
+    },
+    "docs": {
+      "action": "打开文档",
+      "desc": "安装、模型、场景与动作的说明",
+      "title": "使用文档"
+    },
+    "email": {
+      "action": "写邮件",
+      "desc": "附上复现步骤会更快",
+      "title": "邮件支持"
+    },
+    "feedback": {
+      "action": "提 Issue",
+      "desc": "遇到问题，或者想加一个功能",
+      "title": "反馈与建议"
+    },
+    "help": {
+      "title": "帮助与反馈"
+    },
+    "repository": {
+      "action": "打开 GitHub",
+      "desc": "源码、更新与问题追踪都在 GitHub",
+      "title": "源码仓库"
+    },
+    "support": {
+      "title": "支持作者"
+    },
+    "title": "关于",
+    "wechat": {
+      "desc": "扫码支持作者",
+      "qrAlt": "微信赞赏二维码",
+      "qrUnavailable": "赞赏码暂时加载不出来",
+      "title": "微信赞赏"
+    }
+  },
   "common": {
     "title": "通用设置",
     "chat": {
-      "title": "聊天设置",
+      "title": "个人资料",
       "avatar": {
         "title": "头像",
         "desc": "自定义头像"
@@ -161,6 +210,11 @@
       "title": "自动进行情感分析",
       "modelDesc": "指定用于情感分析的模型"
     }
+  },
+  "tab": {
+    "about": "关于",
+    "common": "通用设置",
+    "touch": "触摸设定"
   },
   "touch": {
     "title": "触摸设定"

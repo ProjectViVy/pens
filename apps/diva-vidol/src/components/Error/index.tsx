@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
 import { MAX_WIDTH } from '@/constants/common';
-import ClearChat from '@/features/Actions/ClearSession';
 import ResetConfig from '@/features/Actions/ResetConfig';
 
 interface ErrorCaptureProps {
@@ -45,7 +44,6 @@ const ErrorCapture = memo<ErrorCaptureProps>(({ reset, error }) => {
       </h2>
       <p style={{ marginBottom: '2em' }}>
         {t('errorTip.description')}
-        <ClearChat text={t('errorTip.clearSession')} type={'link'} />
         {t('errorTip.or')} <ResetConfig text={t('errorTip.resetSystem')} type={'link'} />
         {t('errorTip.forgive')}
       </p>

@@ -20,98 +20,92 @@ export enum MotionPresetName {
   MaleAngry = 'male_angry',
 }
 
-export const motionPresetMap: Record<
-  MotionPresetName,
-  {
-    url: string;
-    type: MotionFileType;
-    name: string;
-  }
-> = {
-  idle: {
-    url: 'https://r2.vidol.chat/vmd/stand.vmd',
-    type: MotionFileType.VMD,
-    name: 'Female/Stand',
-  },
-  female_happy: {
-    url: 'https://r2.vidol.chat/animations/c9c98a38-b96c-11e4-a802-0aaa78deedf9.fbx',
-    type: MotionFileType.FBX,
-    name: 'Female/Happy',
-  },
-  male_happy: {
-    url: 'https://r2.vidol.chat/animations/c9ccf37e-b96c-11e4-a802-0aaa78deedf9.fbx',
-    type: MotionFileType.FBX,
-    name: 'Male/Happy',
-  },
-  female_angry: {
-    url: 'https://r2.vidol.chat/animations/c9c98b02-b96c-11e4-a802-0aaa78deedf9.fbx',
-    type: MotionFileType.FBX,
-    name: 'Female/Angry',
-  },
-  male_angry: {
-    url: 'https://r2.vidol.chat/animations/c9c916ce-b96c-11e4-a802-0aaa78deedf9.fbx',
-    type: MotionFileType.FBX,
-    name: 'Male/Angry',
-  },
+/**
+ * 动作素材线（Hanami → lobe 移植）
+ *
+ * 素材来自 `public/vrma/`：Overte（Apache-2.0）、Microsoft Rocketbox（MIT）、
+ * Quaternius（CC0），经 `scripts/port-hanami-motion.mjs` 索引到 `vrma/index.json`。
+ * 这里只保留旧面板仍按名引用的 17 个「预设」，映射到语义最接近的真实片段；
+ * 完整动作库由动作面板直接读索引（见 `libs/motionLibrary`）。
+ */
+export interface MotionPreset {
+  url: string;
+  type: MotionFileType;
+  name: string;
+  /** 一次性动作播完自动回 idle；待机类为 true */
+  loop: boolean;
+}
+
+export const motionPresetMap: Record<MotionPresetName, MotionPreset> = {
+  idle: { url: '/vrma/idle.vrma', type: MotionFileType.VRMA, name: '待机', loop: true },
+  female_happy: { url: '/vrma/happy.vrma', type: MotionFileType.VRMA, name: '开心', loop: false },
+  male_happy: { url: '/vrma/happy-2.vrma', type: MotionFileType.VRMA, name: '开心', loop: false },
+  female_angry: { url: '/vrma/angry.vrma', type: MotionFileType.VRMA, name: '生气', loop: false },
+  male_angry: { url: '/vrma/angry-2.vrma', type: MotionFileType.VRMA, name: '生气', loop: false },
   female_greeting: {
-    url: 'https://r2.vidol.chat/animations/c9c7996a-b96c-11e4-a802-0aaa78deedf9.fbx',
-    type: MotionFileType.FBX,
-    name: 'Female/Greeting',
+    url: '/vrma/raise-hand.vrma',
+    type: MotionFileType.VRMA,
+    name: '打招呼',
+    loop: false,
   },
-  female_appeal: {
-    url: 'https://r2.vidol.chat/vmd/camera_appeal02.vmd',
-    type: MotionFileType.VMD,
-    name: 'Female/Appeal',
-  },
-  // 新增的配置
+  female_appeal: { url: '/vrma/think.vrma', type: MotionFileType.VRMA, name: '思考', loop: false },
   female_cover_undies: {
-    url: 'https://r2.vidol.chat/vmd/_cover_undies_blush.vmd',
-    type: MotionFileType.VMD,
-    name: 'Female/Cover Undies',
+    url: '/vrma/neutral.vrma',
+    type: MotionFileType.VRMA,
+    name: '中性',
+    loop: false,
   },
   female_kiss: {
-    url: 'https://r2.vidol.chat/vmd/_kiss2_blush_v02.vmd',
-    type: MotionFileType.VMD,
-    name: 'Female/Kiss',
-  },
-  number_meter_1: {
-    url: 'https://r2.vidol.chat/vmd/_number_meter_1.vmd',
-    type: MotionFileType.VMD,
-    name: 'Number Meter 1',
-  },
-  number_meter_2: {
-    url: 'https://r2.vidol.chat/vmd/_number_meter_2.vmd',
-    type: MotionFileType.VMD,
-    name: 'Number Meter 2',
-  },
-  number_meter_3: {
-    url: 'https://r2.vidol.chat/vmd/_number_meter_3.vmd',
-    type: MotionFileType.VMD,
-    name: 'Number Meter 3',
-  },
-  number_meter_4: {
-    url: 'https://r2.vidol.chat/vmd/_number_meter_4.vmd',
-    type: MotionFileType.VMD,
-    name: 'Number Meter 4',
-  },
-  number_meter_5: {
-    url: 'https://r2.vidol.chat/vmd/_number_meter_5.vmd',
-    type: MotionFileType.VMD,
-    name: 'Number Meter 5',
+    url: '/vrma/relaxed.vrma',
+    type: MotionFileType.VRMA,
+    name: '放松',
+    loop: false,
   },
   female_cover_chest: {
-    url: 'https://r2.vidol.chat/vmd/cover_chest_v02.vmd',
-    type: MotionFileType.VMD,
-    name: 'Female/Cover Chest',
+    url: '/vrma/rb-neutral.vrma',
+    type: MotionFileType.VRMA,
+    name: '中性',
+    loop: false,
   },
-  female_stand: {
-    url: 'https://r2.vidol.chat/vmd/stand.vmd',
-    type: MotionFileType.VMD,
-    name: 'Female/Stand',
-  },
+  female_stand: { url: '/vrma/idle-2.vrma', type: MotionFileType.VRMA, name: '待机', loop: true },
   female_stand_mix: {
-    url: 'https://r2.vidol.chat/vmd/standmix2_modified.vmd',
-    type: MotionFileType.VMD,
-    name: 'Female/Stand Mix',
+    url: '/vrma/idle-3.vrma',
+    type: MotionFileType.VRMA,
+    name: '待机',
+    loop: true,
+  },
+  number_meter_1: {
+    url: '/vrma/world-point-in.vrma',
+    type: MotionFileType.VRMA,
+    name: '指',
+    loop: false,
+  },
+  number_meter_2: {
+    url: '/vrma/world-point-hold.vrma',
+    type: MotionFileType.VRMA,
+    name: '指（保持）',
+    loop: true,
+  },
+  number_meter_3: {
+    url: '/vrma/world-point-out.vrma',
+    type: MotionFileType.VRMA,
+    name: '收手',
+    loop: false,
+  },
+  number_meter_4: {
+    url: '/vrma/world-clap-in.vrma',
+    type: MotionFileType.VRMA,
+    name: '拍手',
+    loop: false,
+  },
+  number_meter_5: {
+    url: '/vrma/world-clap-hold.vrma',
+    type: MotionFileType.VRMA,
+    name: '拍手（保持）',
+    loop: true,
   },
 };
+
+/** 待机片段的 url（一次性动作播完回到它） */
+export const IDLE_MOTION_URL = motionPresetMap[MotionPresetName.Idle].url;
+

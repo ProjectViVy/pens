@@ -145,6 +145,55 @@ export default {
   touch: {
     title: '触摸设定',
   },
+  about: {
+    title: '关于',
+    app: {
+      title: '应用信息',
+      desc: '3D 虚拟舞台 · MIT License',
+    },
+    repository: {
+      title: '源码仓库',
+      desc: '源码、更新与问题追踪都在 GitHub',
+      action: '打开 GitHub',
+    },
+    docs: {
+      title: '使用文档',
+      desc: '安装、模型、场景与动作的说明',
+      action: '打开文档',
+    },
+    help: {
+      title: '帮助与反馈',
+    },
+    feedback: {
+      title: '反馈与建议',
+      desc: '遇到问题，或者想加一个功能',
+      action: '提 Issue',
+    },
+    community: {
+      title: '社区支持',
+      desc: 'Discord 群组，和其他人一起讨论',
+      action: '加入 Discord',
+    },
+    email: {
+      title: '邮件支持',
+      desc: '附上复现步骤会更快',
+      action: '写邮件',
+    },
+    support: {
+      title: '支持作者',
+    },
+    coffee: {
+      title: 'Ko-fi',
+      desc: '请作者喝一杯咖啡',
+      action: '前往赞助',
+    },
+    wechat: {
+      title: '微信赞赏',
+      desc: '扫码支持作者',
+      qrAlt: '微信赞赏二维码',
+      qrUnavailable: '赞赏码暂时加载不出来',
+    },
+  },
   tts: {
     title: '语音设置',
     clientCall: {
@@ -173,5 +222,11 @@ export default {
     sessionDesc: '角色设定与会话偏好',
     sessionWithName: '会话设置 · {{name}}',
     title: '设置',
+  },
+  // 移动端设置页顶栏按 tab.xxx 取标题
+  tab: {
+    about: '关于',
+    common: '通用设置',
+    touch: '触摸设定',
   },
 };

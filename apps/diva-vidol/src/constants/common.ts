@@ -1,6 +1,10 @@
-export const AGENT_MARKET_URL = 'https://vidol-market.lobehub.com/agents';
-
-export const DANCE_INDEX_URL = 'https://vidol-market.lobehub.com/dances/index.json';
+/**
+ * 本地素材线：舞蹈走项目内 public/assets 的镜像，
+ * 不再依赖已下线的 r2.vidol.chat / vidol-market.lobehub.com。
+ *
+ * 人物（角色）已经改成静态表，见 src/constants/characters.ts，不再有角色市场索引。
+ */
+export const DANCE_INDEX_URL = '/assets/market/dances/index.json';
 
 export const OSS_PREFIX = 'https://r2.vidol.chat';
 
@@ -44,5 +48,3 @@ export const DEFAULT_AGENT_AVATAR_URL =
   'https://registry.npmmirror.com/@lobehub/assets-logo/1.2.0/files/assets/logo-3d.webp';
 export const ROLE_VIEWER_HEIGHT = 800;
 export const ROLE_VIEWER_WIDTH = 480;
-
-export const PWA_INSTALL_ID = 'pwa-install';

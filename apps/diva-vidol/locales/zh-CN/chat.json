@@ -43,6 +43,11 @@
   },
   "callOff": "挂断",
   "camera": "视频通话",
+  "character": {
+    "more": "更多人物",
+    "onStage": "台上人物",
+    "totalCount": "共 {{total}} 个"
+  },
   "chat": "聊天",
   "chatList": "聊天列表",
   "clear": {
@@ -65,13 +70,19 @@
     "unlimited": "不限历史消息数"
   },
   "info": {
+    "character": "人物",
     "chat": "聊天",
     "dance": "舞蹈",
+    "motion": "动作",
     "motions": "动作",
     "posture": "姿势",
     "background": "背景",
     "stage": "舞台"
   },
+  "motionFallback": "目前这些动作都指向项目自带的 idle_loop.vrma（原 r2 动作素材已下线）。把真实的 fbx / vmd / vrma 放进 public 目录，再改 motionPresetMap 里的地址即可逐个替换。",
+  "motionList": "共 {{total}} 个",
+  "postureHint": "这些是直接用骨骼摆出来的静态姿势，不依赖素材文件。再点一次同一个姿势即可回到待机。",
+  "postureList": "共 {{total}} 个",
   "input": {
     "send": "发送",
     "warp": "换行",

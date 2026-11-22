@@ -118,12 +118,13 @@
   "touch": {
     "addAction": "添加回應動作",
     "area": {
-      "arm": "手臂",
-      "belly": "腹部",
+      "arm": "手和手臂",
+      "belly": "肚子",
       "buttocks": "臀部",
-      "chest": "胸部",
+      "chest": "上半身",
+      "foot": "腳",
       "head": "頭部",
-      "leg": "腿部"
+      "leg": "腿"
     },
     "customEnable": "啟用自訂觸控",
     "editAction": "編輯回應動作",

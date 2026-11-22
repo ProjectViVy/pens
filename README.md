@@ -72,6 +72,10 @@ cd apps/diva-vidol && npm install --legacy-peer-deps
 Standard `npm install` fails there: upstream pins `antd ~5.18.3` while current
 `@lobehub/icons` requires `antd ^5.23`.
 
+It also needs its own assets (VRM models, scenes, animations, ~246 MB). They are
+not in the repository; see
+[apps/diva-vidol/IMPORT.md](apps/diva-vidol/IMPORT.md).
+
 ## The 数字人 page
 
 Two applications, one mechanism: each is a separate process, and each gets its
@@ -96,7 +100,8 @@ because neither may be redistributed:
   point `PENS_STAGE_MODELS` at a directory of models.
 
 DivaVidol needs a model provider key only for chatting; the interface opens
-without one.
+without one. Its own assets are local-only (see above), and without them the
+scene list is empty and no character appears.
 
 The stage wiring is exercised by `npx electron --no-sandbox tools/smoke` (with
 `--user-data-dir` in a sandboxed shell).
@@ -107,10 +112,12 @@ The stage wiring is exercised by `npx electron --no-sandbox tools/smoke` (with
   [vivy-dsh/dsh-stage-app](https://github.com/vivy-dsh/dsh-stage-app) together
   with its commit history. It is a standalone presentation process with a
   token-guarded local HTTP API. See [D-007](docs/DECISIONS.md).
-- `apps/diva-vidol/` — DivaVidol, imported on 2026-11-22 as a snapshot of
-  `lobehub/lobe-vidol` `0.30.0` (`fa50051`), Apache-2.0, upstream license kept.
-  It runs as a Next.js server the panel starts on demand. See
-  [D-012](docs/DECISIONS.md) and [IMPORT.md](apps/diva-vidol/IMPORT.md).
+- `apps/diva-vidol/` — DivaVidol, the owner's VRM stage: a fork of
+  `lobehub/lobe-vidol` (last upstream commit `fa50051`, Apache-2.0, license kept)
+  rewritten into a 3D classroom with a VRM character. Imported from the owner's
+  working tree on 2026-11-22; 396 files differ from upstream. It runs as a
+  Next.js server the panel starts on demand. See
+  [D-013](docs/DECISIONS.md) and [IMPORT.md](apps/diva-vidol/IMPORT.md).
 
 Neither is packaged as a PEN yet, and no PENS runtime loads them.
 

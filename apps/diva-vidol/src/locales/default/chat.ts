@@ -25,7 +25,8 @@ export default {
     motions: '动作',
     posture: '姿势',
     background: '背景',
-    stage: '舞台',
+    scene: '场景',
+  stage: '舞台',
   },
   clear: {
     alert: '确定删除历史消息？',
@@ -127,3 +128,4 @@ export default {
     removed: '该模型不在列表中，若取消选中将会自动移除',
   },
 };
+

@@ -63,3 +63,15 @@ sitemap*.xml
 robots.txt
 
 *.patch
+
+# DIVA-OLV: local-only assets and working junk (same policy as the Live2D stage)
+/public/assets/
+/public/environments/
+/public/vrma/
+/.downloads/
+/.npm-cache/
+/.perf-tmp/
+/shots/
+/scratch/
+*.log
+*.tsbuildinfo

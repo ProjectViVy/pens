@@ -89,6 +89,20 @@ app.whenReady().then(async () => {
   report.url = window.webContents.getURL()
   report.size = await window.webContents.executeJavaScript('${innerWidth}x${innerHeight}' + '').catch(() => null)
   say('url=' + report.url + ' size=' + JSON.stringify(report.size))
+  // 舞台要等 WebGL 与模型加载：等 canvas 出现、场景清单出来，再等两秒出画面。
+  await waitFor(
+    () => window.webContents.executeJavaScript(`!!document.querySelector('canvas') && document.body.innerText.includes('动漫教室')`),
+    120000,
+    'DivaVidol 舞台渲染'
+  )
+  await wait(3000)
+  report.canvases = await window.webContents.executeJavaScript(
+    `JSON.stringify([...document.querySelectorAll('canvas')].map((c) => ({ w: c.width, h: c.height })))`
+  )
+  report.scenes = await window.webContents.executeJavaScript(
+    `JSON.stringify([...document.body.innerText.matchAll(/[\\u4e00-\\u9fa5]{2,8} (?:\\d+\\.\\d+ m²|空舞台)/g)].map((m) => m[0]).slice(0, 8))`
+  )
+  say('canvases=' + report.canvases + ' scenes=' + report.scenes)
   report.shot = await capture(window, 'vidol.png')
   report.runList = await panel.webContents.executeJavaScript(
     `document.querySelector('#run-list') ? document.querySelector('#run-list').innerText : null`

@@ -22,7 +22,6 @@ const metadata: Metadata = {
     shortcut:
       'https://registry.npmmirror.com/@lobehub/assets-favicons/latest/files/assets/favicon.ico',
   },
-  manifest: '/manifest.json',
   openGraph: {
     description: description,
     images: [

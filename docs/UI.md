@@ -14,7 +14,7 @@ DIVA-OLV by D-011.
 | `app-window.cjs` | Shared child-window behaviour: own session partition, own renderer, sandbox, no preload, app-origin navigation only, `backgroundThrottling` off, fixed title. |
 | `stage-session.cjs` | Starts `apps/stage-app/server.mjs` as its own process on a free loopback port with a per-session token. |
 | `stage-window.cjs` | Registers the 数字人 window on top of `app-window.cjs`. |
-| `vidol-session.cjs` | Starts DivaVidol (`next dev`) on a free loopback port; explicit error if dependencies are missing. |
+| `vidol-session.cjs` | Starts DivaVidol (`next dev` in `apps/diva-vidol`, the VRM stage fork) on a free loopback port; explicit error if dependencies are missing. |
 | `vidol-window.cjs` | Registers the DivaVidol window. `package-win.cjs` is the `@electron/packager` build for Windows x64: `dist/DIVA-OLV-win32-x64/` plus a zip. Models, Cubism Core, `node_modules` and `.next` are excluded. |
 
 ## What the UI contains
@@ -59,7 +59,7 @@ Both entries work the same way: start a process, then open a window on it.
 
 - **数字人** — `stage-session.cjs` starts the stage process, then a window titled
   数字人 loads `http://127.0.0.1:<port>/`.
-- **DivaVidol** — `vidol-session.cjs` runs `next dev` in `apps/diva-vidol`
+- **DivaVidol** — `vidol-session.cjs` runs `next dev` in `apps/diva-vidol` (3D classroom + VRM character)
   (first launch compiles, so it takes a while; the panel toasts before and
   after), then a window titled DivaVidol loads it.
 - Both windows are independent of the panel: separate renderer, separate

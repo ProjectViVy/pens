@@ -2,7 +2,11 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -22,12 +26,19 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@live2dFramework/*": ["./src/libs/live2d/Framework/src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@live2dFramework/*": [
+        "./src/libs/live2d/Framework/src/*"
+      ]
     }
   },
-
-  "exclude": ["node_modules", ".next", "src/libs/live2d/**"],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "src/libs/live2d/**"
+  ],
   "include": [
     "next-env.d.ts",
     "vitest.config.ts",
@@ -36,7 +47,8 @@
     "**/*.ts",
     "**/*.d.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    ".next-perf/types/**/*.ts"
   ],
   "ts-node": {
     "compilerOptions": {

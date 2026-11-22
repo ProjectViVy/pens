@@ -16,7 +16,7 @@ import SideBar from './SideBar';
 const Layout = memo<LayoutProps>(({ children, category }) => {
   const ref = useRef<any>(null);
   const { md = true } = useResponsive();
-  const { t } = useTranslation('setting');
+  const { t } = useTranslation('settings');
   const activeKey = useActiveSettingsKey();
 
   return (

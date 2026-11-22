@@ -3,7 +3,7 @@ import { StateCreator } from 'zustand/vanilla';
 
 import { SettingStore, configSelectors } from '@/store/setting';
 import { TouchActionType, touchReducer } from '@/store/setting/reducers/touch';
-import { GenderEnum } from '@/types/agent';
+import { GenderEnum } from '@/types/character';
 import { TouchAction, TouchAreaEnum } from '@/types/touch';
 
 export interface TouchStore {

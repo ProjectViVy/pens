@@ -43,7 +43,8 @@ const Index = (props: IndexProps) => {
       {areaOptions.map((item) => (
         <ListItem
           avatar={<MousePointerClick />}
-          className={classNames(styles.item)}
+          // touch-area-<值> 是给联调定位用的（部位名单里没有别的东西可选中）
+          className={classNames(styles.item, `touch-area-${item.value}`)}
           active={item.value === currentTouchArea}
           key={item.value}
           title={item.label}

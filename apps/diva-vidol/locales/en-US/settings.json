@@ -1,4 +1,53 @@
 {
+  "about": {
+    "app": {
+      "desc": "3D virtual stage · MIT License",
+      "title": "Application"
+    },
+    "coffee": {
+      "action": "Sponsor on Ko-fi",
+      "desc": "Buy the author a coffee",
+      "title": "Ko-fi"
+    },
+    "community": {
+      "action": "Join Discord",
+      "desc": "Discuss with others on the Discord server",
+      "title": "Community"
+    },
+    "docs": {
+      "action": "Open documentation",
+      "desc": "Setup, models, rooms and motions",
+      "title": "Documentation"
+    },
+    "email": {
+      "action": "Send email",
+      "desc": "Attaching the steps to reproduce helps a lot",
+      "title": "Email support"
+    },
+    "feedback": {
+      "action": "Open an issue",
+      "desc": "Report a problem, or ask for a feature",
+      "title": "Feedback"
+    },
+    "help": {
+      "title": "Help & Feedback"
+    },
+    "repository": {
+      "action": "Open GitHub",
+      "desc": "Source code, releases and issues live on GitHub",
+      "title": "Repository"
+    },
+    "support": {
+      "title": "Support the Author"
+    },
+    "title": "About",
+    "wechat": {
+      "desc": "Scan the QR code to support the author",
+      "qrAlt": "WeChat tip QR code",
+      "qrUnavailable": "The QR code image can't be loaded right now.",
+      "title": "WeChat tip"
+    }
+  },
   "common": {
     "chat": {
       "avatar": {
@@ -10,7 +59,7 @@
         "placeholder": "Please enter your nickname",
         "title": "Nickname"
       },
-      "title": "Chat Settings"
+      "title": "Profile"
     },
     "system": {
       "clear": {
@@ -161,6 +210,11 @@
       "title": "Automatic Emotion Analysis"
     },
     "title": "System Agent"
+  },
+  "tab": {
+    "about": "About",
+    "common": "General",
+    "touch": "Touch"
   },
   "touch": {
     "title": "Touch Settings"
