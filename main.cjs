@@ -3,6 +3,8 @@ const path = require('node:path')
 const fs = require('node:fs')
 const { stopStage, STAGE_DIR } = require('./stage-session.cjs')
 const { registerStageIpc, setModelsDir } = require('./stage-window.cjs')
+const { registerVidolIpc } = require('./vidol-window.cjs')
+const { stopVidol } = require('./vidol-session.cjs')
 
 /** 模型：环境变量优先，其次 stage-app 自己的 models/，都没有就让舞台自己报缺。 */
 function modelsDir() {
@@ -13,10 +15,11 @@ function modelsDir() {
 
 setModelsDir(modelsDir)
 registerStageIpc(ipcMain)
+registerVidolIpc(ipcMain)
 
 async function openPanelWindow() {
   const window = new BrowserWindow({
-    title: 'PENS',
+    title: 'DIVA-OLV',
     width: 1280,
     height: 900,
     minWidth: 480,
@@ -52,5 +55,5 @@ app.whenReady().then(() => {
   app.exit(1);
 });
 
-app.on('before-quit', () => stopStage())
+app.on('before-quit', () => { stopStage(); stopVidol() })
 app.on('window-all-closed', () => app.quit());

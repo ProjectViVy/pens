@@ -198,6 +198,61 @@ What this does not settle:
   fresh clone shows the stage's explicit "no model" state rather than a picture.
 - The shell decision (D-001, D-005). This is still the Electron runner.
 
+## D-011 — The product is DIVA-OLV; PENS stays the vocabulary
+
+Proposed by the owner on 2026-11-22 (Asia/Shanghai): 名字需要修改为 DIVA-OLV，备注原项目.
+
+What changed:
+
+- The panel names itself **DIVA-OLV** everywhere a person can see it: window
+  title, wordmark, desktop aria-label, app header hint, settings, notes, the
+  downloaded drawing file, and the packaged artifact name
+  (`dist/DIVA-OLV-win32-x64/`, `DIVA-OLV-Demo-Windows-x64.zip`).
+- `package.json` is `diva-olv` / `DIVA-OLV`, description records the origin.
+- README opens with the rename and points back to the original name.
+
+What deliberately did not change:
+
+- The repository is still `pens`, and the document vocabulary (`PEN`, `PENS`)
+  is unchanged — this decision renames a product, not a project. Existing
+  decisions keep their original wording.
+- The renderer bridge is still `window.pens`. It is an internal identifier, and
+  renaming it would churn the bridge, the panel and the smoke test for no
+  visible gain.
+
+Rollback: revert the one commit; no state or data format moved.
+
+## D-012 — DivaVidol is the second application, imported as a snapshot
+
+Asked for on 2026-11-22 (Asia/Shanghai): 移植 lobe-vidol，加入数字人板块，取名 DivaVidol.
+
+What was done:
+
+- `apps/diva-vidol/` holds `lobehub/lobe-vidol` `0.30.0` as a **snapshot** of
+  its tracked files at `fa50051` (`git archive HEAD`), not a subtree: upstream
+  is third-party Apache-2.0 code whose history we have no reason to carry, and
+  the snapshot plus `IMPORT.md` records exactly which commit it came from. The
+  upstream `LICENSE` stays in place.
+- It runs as a Next.js server the panel starts on demand
+  (`vidol-session.cjs`): random loopback port, `next dev`, ready when the page
+  answers. Window behaviour is shared with the stage through `app-window.cjs`;
+  the window has its own partition (`persist:pens-vidol`), sandbox, no preload.
+- The 数字人 page now has two entries: 数字人 (stage) and DivaVidol.
+- Dependencies are installed once by hand with `--legacy-peer-deps`: upstream
+  pins `antd ~5.18.3` while current `@lobehub/icons` peers on `antd ^5.23`. The
+  panel refuses with an explicit message if `node_modules/next` is missing
+  rather than silently installing a few hundred megabytes.
+
+What this does not settle:
+
+- Whether DivaVidol should become a packaged PEN or stay a development server.
+  Today the panel runs `next dev`; a production build (`next build` +
+  `next start`) would boot faster but adds a build step to every change.
+- Whether the ported UI should keep upstream's branding inside the app. Only
+  the entry, window title and directory say DivaVidol.
+- Model provider configuration. The app opens without a key; chatting needs
+  one, set in the app or via environment variables.
+
 ## Proposed technical direction
 
 These recommendations are retained for the next design discussion. They are

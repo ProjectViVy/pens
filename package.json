@@ -1,8 +1,8 @@
 {
-  "name": "pens-ui",
-  "productName": "PENS",
-  "version": "0.1.0",
-  "description": "PENS desktop UI",
+  "name": "diva-olv",
+  "productName": "DIVA-OLV",
+  "version": "0.2.0",
+  "description": "DIVA-OLV desktop panel (originally PENS)",
   "private": true,
   "main": "main.cjs",
   "scripts": {
