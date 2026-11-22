@@ -130,6 +130,8 @@ What is true after the import:
   `.od-skills/`, `index.html.artifact.json`) were not imported.
 
 Moved to the repository root on 2026-11-22 by D-009; file contents unchanged.
+The four placeholders listed above were removed by D-010, which also wired
+数字人 to `apps/stage-app/`.
 
 ### D-009 — The panel sits at the repository root
 
@@ -156,6 +158,45 @@ What this does not settle:
 - Where a future runtime, SDK or core lives. A root-level panel frees `apps/`
   for applications but does not decide `core/` or `sdk/`.
 - Whether the panel should stay at the root once a runtime exists.
+
+## D-010 — The digital human is a separate process behind a child window
+
+Proposed by the owner on 2026-11-22 (Asia/Shanghai): clicking 数字人 must open a
+fully independent child window running the real stage application, all
+placeholders must go, and the two windows should be as independent as practical
+for performance.
+
+Implemented:
+
+- The stage runs as its own Node process, spawned by `stage-session.cjs` on a
+  free loopback port with a per-session token and `STAGE_MODELS` pointing at a
+  local model directory. The panel talks to it over nothing but that URL.
+- Clicking the tile opens a second `BrowserWindow` with its own session
+  partition (`persist:pens-stage`), `sandbox` on, `nodeIntegration` off, no
+  preload, navigation restricted to the stage origin, and
+  `backgroundThrottling` off. Hiding the panel does not slow the stage.
+- The renderer bridge is two IPC calls (`stage:open`, `stage:close`) exposed
+  through `preload.cjs`. Nothing else of Electron is reachable from the UI.
+- The panel keeps no in-app page for the digital human; the placeholder
+  applications (语音伙伴, 小游戏, 数独) were removed rather than hidden, so the
+  panel lists thirteen entries across three pages.
+
+Why a second window of the same app rather than a second Electron process: a
+separate renderer process plus a separate session is the cheapest independence
+that still shares one application lifecycle, and it was measured — 61 fps with
+the panel visible and 61 fps with it hidden. The remaining shared piece is
+Chromium's GPU process; a second Electron process would buy a second GPU process
+at the cost of another full runtime and lifecycle, which is not justified before
+a measurement shows contention.
+
+What this does not settle:
+
+- Whether the panel should own the stage process forever, or whether the stage
+  should become a separately installed PEN. Today the panel owns it and stops it
+  on quit; the stage window itself is independent of the panel window.
+- Model and Cubism Core distribution. Both are local-only and gitignored, so a
+  fresh clone shows the stage's explicit "no model" state rather than a picture.
+- The shell decision (D-001, D-005). This is still the Electron runner.
 
 ## Proposed technical direction
 
