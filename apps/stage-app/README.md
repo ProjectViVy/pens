@@ -13,7 +13,7 @@ npm run check    # 自检：舞台在不在
 |---|---|
 | `stage/` | 渲染层、编译器、引擎、手臂联动、资产加载 |
 | `src/` | 档案、模型仓库、指令箱、能力说明、表演规则、路径安全 |
-| `models/` 之外 | 模型本体不在这里：默认读 `$DSH_HOME/live2d/models`，可用 `STAGE_MODELS` 改 |
+| `models/` | 模型本体不随仓库分发（已 gitignore）：默认读 `<stage-app>/models`，可用 `STAGE_MODELS` 改 |
 | `data/` | 语义知识、表演库、参数清单 |
 | `vendor/` | Cubism Core、PIXI |
 | `demo/` | 示例模型（原厂 Hiyori） |
@@ -69,8 +69,8 @@ agent-diva 的研究包把呈现与具身划成独立的 **Mirror**：
 | `STAGE_PORT` | `5462` | 监听端口 |
 | `STAGE_HOST` | `127.0.0.1` | 监听地址 |
 | `STAGE_TOKEN` | 随机生成 | 固定令牌（自动化时有用） |
-| `STAGE_MODELS` | `$DSH_HOME/live2d/models` | 模型目录 |
-| `STAGE_PROFILES` | `<repo>/.artifacts/stage-profiles` | 档案缓存目录 |
+| `STAGE_MODELS` | `<stage-app>/models` | 模型目录 |
+| `STAGE_PROFILES` | `<stage-app>/.cache/stage-profiles` | 档案缓存目录 |
 | `STAGE_DEPTH` | `8` | 指令箱深度 |
 
 ## 交互

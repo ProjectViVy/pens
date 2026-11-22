@@ -7,3 +7,7 @@ node_modules/
 
 # Live2D Hiyori 示例模型需使用者自行下载，不随源码分发
 /demo/Hiyori/
+
+# 本地模型与缓存：不随仓库分发，使用者自备
+/models/
+/.cache/

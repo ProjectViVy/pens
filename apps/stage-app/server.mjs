@@ -34,10 +34,10 @@ const ROOT = fileURLToPath(new URL('.', import.meta.url))
 const PORT = Number(process.env.STAGE_PORT ?? 5462)
 const HOST = process.env.STAGE_HOST ?? '127.0.0.1'
 /** 模型放哪：默认跟着 DSH 的角色目录走，也可以自己指。 */
-const MODELS = resolve(process.env.STAGE_MODELS ?? join(ROOT, '..', '.artifacts', 'dsh-home', 'live2d', 'models'))
+const MODELS = resolve(process.env.STAGE_MODELS ?? join(ROOT, 'models'))
 const KNOWLEDGE = join(ROOT, 'data', 'knowledge')
 const PERFORMANCES = join(ROOT, 'data', 'performances')
-const PROFILES = process.env.STAGE_PROFILES ?? join(ROOT, '..', '.artifacts', 'stage-profiles')
+const PROFILES = process.env.STAGE_PROFILES ?? join(ROOT, '.cache', 'stage-profiles')
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -350,7 +350,7 @@ async function serveFile(req, res, path) {
  */
 async function persistToken() {
   // 与工具桥同一个约定：$DSH_HOME/live2d/stage-token。两边各写一份就迟早对不上。
-  const home = process.env.DSH_HOME ?? join(ROOT, '..', '.artifacts', 'dsh-home')
+  const home = process.env.DSH_HOME ?? join(ROOT, '.cache', 'dsh-home')
   const dir = join(home, 'live2d')
   try {
     await mkdir(dir, { recursive: true })
