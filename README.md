@@ -1,23 +1,23 @@
 # PENS
 
-An application environment for agents to participate in human life.
+PENS is an operation panel for equipping agent harnesses and managing external
+abilities. Import a Bundle once, then install its Skills, native plugin or
+protocol configuration into the selected harnesses. Codex, Pi, Claude Code
+and Hermes are the compatibility targets.
 
-PENS is envisioned as an agent's phone or game console: agents bring their own
-reasoning and perception, while installable PEN applications provide access to
-games, media, social spaces, and other human activities.
-
-A **PEN** is an application package for a coherent capability or activity.
-**PENS** runs and manages those applications. It is an independent project;
-VIVY is a prospective consumer alongside other agents.
+A **Bundle** is the source package for cross-harness delivery. An **Ability**
+gives an agent access to an activity such as playing Minecraft or operating a
+digital-human stage. A Bundle can provide an Ability alongside Skills and
+host-specific entry points. Agents supply their own reasoning and perception.
 
 ## Project status
 
 **Decisions, repository bootstrap, the panel source, and two applications wired
 to it.** The 数字人 page opens both applications in their own windows: the Live2D
-stage and DivaVidol. No PENS runtime, application package format, SDK, desktop
-shell, or agent integration has been implemented or tested here.
+stage and DivaVidol. Bundle conversion and installation, MSP lifecycle
+management, and harness integration await implementation and verification.
 
-- [Founding decisions and open questions](docs/DECISIONS.md)
+- [Design decisions and open questions](docs/DECISIONS.md)
 - [Historical research and source provenance](docs/REFERENCES.md)
 - [The panel: what it is and what is still missing](docs/UI.md)
 
@@ -122,14 +122,15 @@ Neither is packaged as a PEN yet, and no PENS runtime loads them.
 
 ## Product direction
 
-- Keep complex, supplementary life applications outside the agent core.
-- Preserve world perception, including image and video understanding, as an
-  agent-core capability.
-- Package applications independently and make them usable by different agents.
-- Provide a simple main panel for people to manage applications and see state.
-- Validate first with **Hermes and Codex** using the same application package.
+- Install simple Skills directly in the intended scope. Reuse native plugin
+  entry points and generate host-specific configuration where behavior can be
+  preserved. Show compatibility gaps before installation.
+- Select Skill, native plugin, MCP or MSP support according to the package
+  requirements and the target harness. Track each installation so it can be
+  removed cleanly from the intended scope.
+- Manage an MSP node's runtime independently of each harness attachment.
+  Starting or stopping a node and connecting or detaching an agent are
+  distinct actions in the panel.
 
-Go for the PENS service and TypeScript for the panel are the current technical
-recommendation, subject to integration validation. PEN packages should not be
-restricted to the host's implementation language. A future application store
-is a product possibility, not an implemented or scheduled feature.
+See [D-018](docs/DECISIONS.md#d-018--bundles-adapt-to-the-harness-and-abilities-have-a-runtime-lifecycle)
+for the design and proposed validation samples.
