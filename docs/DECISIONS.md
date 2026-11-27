@@ -1,6 +1,6 @@
-# PENS founding decisions
+# PENS design decisions
 
-Date: 2026-09-29 (Asia/Shanghai); updated 2026-11-21.
+Date: 2026-09-29 (Asia/Shanghai); updated 2026-11-27.
 Source: the project owner's discussion and repository initialization request.
 
 This is the current decision record for PENS. **Confirmed** means explicitly
@@ -13,8 +13,8 @@ explicitly approved. Neither status means an implementation exists.
 
 PENS gives agents access to human activities through external applications.
 The owner's product analogy is an agent's phone operating system or game
-console. A PEN is an application; PENS is the environment that makes such
-applications available to agents.
+console. PENS also equips agent harnesses with portable skills and native plugins.
+Agents can use either part of the environment independently.
 
 The product is intended to serve different agents, rather than be a
 VIVY-specific subsystem. VIVY may consume PENS, but must not be a prerequisite
@@ -24,7 +24,7 @@ not verified compatibility or available integration APIs.
 
 ### D-002 — Supplementary life capabilities are external
 
-The primary scope is non-coding applications that let an agent participate
+The Ability scope includes non-coding applications that let an agent participate
 in human life: playing games, watching films, and joining social spaces such
 as QQ or WeChat groups.
 
@@ -51,14 +51,12 @@ still requires an interface design.
 
 ### D-004 — Applications are distributed as packages
 
-A PEN must exist as a package. The owner described one function as one
-package and explicitly raised the possibility of an application store.
-Package format, installation, update rules, distribution, and store operation
-have not been chosen.
+A PEN application is distributed as an independently installable package for
+a coherent activity. The application can keep its related actions and events
+together. D-018 defines how a Bundle delivers skills, plugins and connections
+to target harnesses, including for packages that provide an Ability.
 
-A proposed interpretation is one coherent application per package, with its
-related actions and events together. Granularity remains to be validated;
-the discussion did not require one package per low-level tool operation.
+Package format and store operation remain open.
 
 ### D-005 — Simple main panel
 
@@ -66,15 +64,12 @@ The primary human-facing surface should be a simple main panel, with the
 visual simplicity of an Apple desktop. This is a product direction, not a
 choice of desktop framework or a requirement to reproduce a particular UI.
 
-### D-006 — Hermes and Codex are the first validation consumers
+### D-006 — Cross-harness validation
 
-The owner explicitly selected Hermes and Codex for the initial test instead
-of starting with VIVY. This should expose assumptions that accidentally tie
-PENS to the author's own agent framework.
-
-The exact Hermes distribution/version and Codex surface/version must be
-pinned during the integration investigation. No integration test has run.
-VIVY remains a later prospective consumer; no rollout schedule is assigned.
+The founding decision selected Hermes and Codex to validate independence
+from VIVY. D-018 now sets Codex, Pi, Claude Code and Hermes as the compatibility
+targets. Pin the client versions and scopes for each validation run and record
+the behavior observed on each host.
 
 ### D-007 — The stage application moves into PENS
 
@@ -390,65 +385,85 @@ What deliberately did not change:
 History: D-011 introduced DIVA-OLV on 2026-11-22; it is marked superseded here.
 Rollback: revert the one commit; no state or data format moved.
 
-## Proposed technical direction
+## D-018 — Bundles adapt to the harness and Abilities have a runtime lifecycle
 
-These recommendations are retained for the next design discussion. They are
-not frozen protocol or implementation decisions.
+Confirmed on 2026-11-27 (Asia/Shanghai). PENS provides a common operation
+panel for equipping different agents with the extensions each harness can
+use. Package requirements and the selected harness determine the integration
+mechanism. The integration plan can select native plugins, Skills, direct MSP or
+package-specific MCP connections according to those requirements.
 
-| Proposal | Reason and remaining condition |
+### Bundle import, conversion and installation
+
+A Bundle groups reusable content and host-specific entry points under one
+source package. Users import a Bundle in the PENS panel and choose the
+harnesses and scopes where it should be available. Codex, Pi, Claude Code and
+Hermes are the compatibility targets. A Bundle can deliver Skills and plugins
+on its own or include access to an Ability.
+
+- For a pure Skill, PENS installs the existing `SKILL.md` and its resources in a
+  directory the target harness supports. A shared global directory is suitable
+  when the user selects shared visibility. Use a harness-specific scope when
+  installation or removal must apply to one host.
+- When the source already provides a native entry point, use it. Superpowers
+  ships shared Skills with separate Codex, Pi, Claude Code and Hermes entry
+  points.
+- For a source imported from one harness, retain the original files and reuse
+  portable content when exporting to another. Generate target configuration
+  for supported mappings. Host-specific behavior, such as a session hook,
+  needs an equivalent native mechanism and may require an adapter supplied
+  with the Bundle.
+- Evaluate compatibility per target and version. Show the mechanism PENS will
+  install and any behavior it cannot reproduce. Mark a target fully compatible
+  only when it can provide all required behavior. Partial support should be
+  visible before installation.
+
+### Installation ownership and removal
+
+Track the installed Bundle version, target and scope, and the files,
+configuration entries and native registrations created or reused by PENS.
+Use the host's uninstall mechanism where available and reverse PENS-owned
+changes. Preserve pre-existing installations, user edits and shared resources
+still in use. A partially failed installation must be recoverable from the
+changes already made.
+
+### Ability and MSP lifecycle
+
+An Ability exposes a coherent activity to an agent, such as playing Minecraft
+or operating a digital-human stage. A Bundle can install the host-side entry
+point for that Ability. PENS manages the lifecycle of an MSP node it installs,
+including dependency and configuration checks, start, readiness and health,
+logs, stop, restart, update and recovery, and removal.
+
+Record separately whether the node is installed, whether its instance is
+running, and which harnesses are attached. Removing a harness attachment
+affects that harness. Stopping the node affects all attached agents. A
+harness can connect over native MSP when supported or use a capability-specific
+bridge when its available integration requires one.
+
+## Proposed validation
+
+These samples exercise the design. Their integration status is unverified.
+
+| Sample | Evidence to collect |
 | --- | --- |
-| Go for the PENS core service | Manage processes, connections, package lifecycle, permissions, and state; confirm against the two initial integrations |
-| TypeScript for the main panel | Build the simple application surface; frontend framework and desktop packaging are open |
-| Language-neutral PEN packages | Let each application use its domain ecosystem; define the actual runtime and transport contract first |
-| Independent service with public agent interfaces | Demonstrate use without importing VIVY internals; public interface is not yet designed |
-| Reuse compatible existing protocols where sufficient | MCP is a candidate integration mechanism, not a chosen complete application-runtime contract |
-| Separate installation from activation and context exposure | Avoid injecting every installed tool and every background event into the agent; event and attention policy require validation |
-| Retain application state across agent connections where appropriate | Define ownership and recovery per application; do not assume another agent inherits credentials or authorization |
+| One pure Skill | Install directly into the intended scope. Verify visibility and remove it from one harness without disrupting another installation. |
+| Superpowers | Import one upstream version and install its native entry points for Codex, Pi, Claude Code and Hermes. Check Skill discovery and session behavior per host, record any gaps, and verify clean removal. |
+| Minecraft MSP | Reuse the existing MSP World node. Verify configuration, start, readiness, stop, restart, update recovery and removal. Check that detaching one harness leaves other connections intact and that node stop is observable by attached agents. |
 
-The phrase "advanced harness" is a hypothesis about PENS's value. Whether it
-provides harness-adjacent execution services should follow concrete needs.
-The discussion did not authorize a second general agent loop, model provider
-stack, personality system, or memory system inside PENS.
+See [Superpowers](https://github.com/obra/superpowers) and the
+[Minecraft MSP World](https://github.com/msp-world/minecraft).
 
-## Proposed first proof
+## Open implementation decisions
 
-Use one real PEN package with Hermes and Codex in separate test runs. The
-application's business code should be identical; host integration adapters
-may differ. The first application for this proof has not been selected.
-Minecraft was an assistant-proposed candidate, and Browser PEN was a historical
-DIVA proposal; neither is an approved PENS starting point. D-007 imported the
-stage application as repository code, but it is not a packaged PEN and has not
-been used in either host.
-
-| Check | Evidence needed |
-| --- | --- |
-| Independence | Start PENS and the application without VIVY |
-| Portability | Both agents use the same package version without business-code changes |
-| Complete interaction | Read state, perform actions, receive results, and stop activity |
-| Continuity | Disconnect/reconnect behavior matches the application's declared state and authorization rules |
-| Interference | Observe context/tool exposure, event volume, model calls, and handling of background activity |
-| Failure behavior | Make application exits, timeouts, cancellation, and denied actions visible to both hosts |
-
-Start by validating each host separately. Concurrent control of one shared
-application instance is a separate proposed experiment because it needs
-control ownership and conflict behavior.
-
-Calling one tool successfully is evidence for that call only. Streaming,
-unsolicited events, wake-up, multimedia input, and recovery must be reported
-per host as verified, unsupported, or untested. PENS cannot confer a host
-capability that the host does not expose.
-
-## Open decisions before implementation
-
-1. Select and pin the actual Hermes and Codex clients and their integration paths.
-2. Select the first complete application scenario and initial operating system.
-3. Confirm the host language, panel framework, and process/runtime boundary.
-4. Define the smallest package, identity, permissions, lifecycle, observation,
-   action, and event contracts needed by that scenario.
-5. Define state ownership, secret handling, cancellation, and reconnect behavior
-   across the application, PENS, and each agent host.
-6. Determine whether a desktop shell is necessary for the initial product.
-7. Revisit store and distribution design after package use is demonstrated.
+1. Pin the initial operating system, harness versions and install scopes.
+2. Define the minimum compatibility configuration and installation record,
+   including how host reloads and partial failures are reported.
+3. Verify the runtime boundary, secret storage, attachment authorization and
+   node recovery strategy with the first MSP sample.
+4. Confirm the panel and service implementation after testing those paths.
+   Go for a service and TypeScript for the panel remain proposals.
+5. Revisit store and distribution design after local package use is demonstrated.
 
 ## Relationship to the historical DIVA research
 
