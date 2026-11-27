@@ -83,3 +83,31 @@ export const getCharacterById = (id: string): Character | undefined =>
 
 export const defaultCharacter =
   getCharacterById(DEFAULT_CHARACTER_ID) || characters[0];
+
+
+export const LOCAL_VRM_PREFIX = 'local:';
+
+/**
+ * 导入的人物没有缩略图（VRM 里没有一张能直接当封面的图），
+ * 用名字首字生成一张 SVG 占位，GridList 拿它当 background-image 用。
+ */
+const placeholderAvatar = (name: string): string => {
+  const initial = [...name.trim()].slice(0, 2).join('') || '人';
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320">` +
+    `<rect width="320" height="320" fill="#eef1fb"/>` +
+    `<text x="160" y="160" fill="#4b57c9" font-family="sans-serif" font-size="96" ` +
+    `text-anchor="middle" dominant-baseline="central">${initial}</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+};
+
+/** 把本地库里的一条记录变成台上能用的人物 */
+export const localVrmToCharacter = (meta: { id: string; name: string }): Character => ({
+  avatar: placeholderAvatar(meta.name),
+  cover: '',
+  description: '本地导入 · 存在这台机器的浏览器里',
+  gender: GenderEnum.FEMALE,
+  id: meta.id,
+  modelUrl: `${LOCAL_VRM_PREFIX}${meta.id}`,
+  name: meta.name,
+});

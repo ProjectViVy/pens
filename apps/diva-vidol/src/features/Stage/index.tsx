@@ -1,11 +1,11 @@
 'use client';
 
 import { isEqual } from 'lodash-es';
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
 import CharacterViewer from '@/features/CharacterViewer';
-import { characterSelectors, useCharacterStore } from '@/store/character';
+import { characterSelectors, ensureLocalVrmLoaded, useCharacterStore } from '@/store/character';
 import { useGlobalStore } from '@/store/global';
 
 import Background from './Background';
@@ -34,6 +34,11 @@ export default memo(() => {
     isEqual,
   );
   const showChatSidebar = useGlobalStore((s) => s.showChatSidebar);
+
+  // 上次可能选的是本机导入的人物：先读一次本地库，再决定谁上台
+  useEffect(() => {
+    void ensureLocalVrmLoaded();
+  }, []);
 
   return (
     <Flexbox

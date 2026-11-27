@@ -1,19 +1,14 @@
-# DIVA-OLV
-
-> Renamed from **PENS** on 2026-11-22 (Asia/Shanghai) at the owner's request
-> ([D-011](docs/DECISIONS.md)). The repository, package concept and history keep
-> the PENS vocabulary; the product you launch is called **DIVA-OLV**.
+# PENS
 
 An application environment for agents to participate in human life.
 
-DIVA-OLV is envisioned as an agent's phone or game console: agents bring their
-own reasoning and perception, while installable PEN applications provide access
-to games, media, social spaces, and other human activities.
+PENS is envisioned as an agent's phone or game console: agents bring their own
+reasoning and perception, while installable PEN applications provide access to
+games, media, social spaces, and other human activities.
 
 A **PEN** is an application package for a coherent capability or activity.
-**DIVA-OLV** (the runtime formerly called PENS) runs and manages those
-applications. It is an independent project; VIVY is a prospective consumer
-alongside other agents.
+**PENS** runs and manages those applications. It is an independent project;
+VIVY is a prospective consumer alongside other agents.
 
 ## Project status
 
@@ -28,7 +23,7 @@ shell, or agent integration has been implemented or tested here.
 
 ## Layout
 
-- `index.html`, `main.cjs`, `package-win.cjs`, `package.json` — the DIVA-OLV
+- `index.html`, `main.cjs`, `package-win.cjs`, `package.json` — the PENS
   panel, at the repository root since [D-009](docs/DECISIONS.md). One
   self-contained HTML launcher plus a minimal Electron runner.
 - `preload.cjs` — the whole renderer bridge: four IPC calls, nothing else.
@@ -49,7 +44,7 @@ shell, or agent integration has been implemented or tested here.
 ```
 npm install
 npm start            # electron .
-npm run package:win  # writes dist/DIVA-OLV-win32-x64/ and a zip
+npm run package:win  # writes dist/PENS-win32-x64/ and a zip
 ```
 
 The panel is UI only: no PENS runtime, no PEN package, and no agent integration.
@@ -75,6 +70,10 @@ Standard `npm install` fails there: upstream pins `antd ~5.18.3` while current
 It also needs its own assets (VRM models, scenes, animations, ~246 MB). They are
 not in the repository; see
 [apps/diva-vidol/IMPORT.md](apps/diva-vidol/IMPORT.md).
+
+**Importing a character:** in the stage settings drawer open 人物 and press
+导入 VRM. The file is kept in this machine's browser storage (IndexedDB), never in the
+repository, and shows up next to the built-in characters.
 
 ## The 数字人 page
 

@@ -19,7 +19,7 @@ registerVidolIpc(ipcMain)
 
 async function openPanelWindow() {
   const window = new BrowserWindow({
-    title: 'DIVA-OLV',
+    title: 'PENS',
     width: 1280,
     height: 900,
     minWidth: 480,

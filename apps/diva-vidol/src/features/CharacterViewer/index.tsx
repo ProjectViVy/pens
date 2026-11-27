@@ -4,10 +4,12 @@ import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ScreenLoading from '@/components/ScreenLoading';
+import { EMPTY_ID } from '@/constants/stage';
 import { toStageEmotion } from '@/libs/emoteController/stageExpression';
 import { MotionFileType } from '@/libs/emoteController/type';
 import { loadEnvironmentManifest } from '@/libs/environment';
-import { DEFAULT_ROOM_ID, getPreferredRoomId, setPreferredRoomId } from '@/libs/stageNav/roomPreference';
+import { resolveModelUrl } from '@/libs/localVrm';
+import { getPreferredRoomId, setPreferredRoomId } from '@/libs/stageNav/roomPreference';
 import * as THREE from 'three';
 import { characterSelectors, useCharacterStore } from '@/store/character';
 import { useGlobalStore } from '@/store/global';
@@ -176,7 +178,8 @@ function CharacterViewer(props: Props) {
     }
 
     if (viewer.model && viewer.loadedCharacterId === character.id) {
-      viewer.resetCamera();
+      // 从设置页回来也回到「默认模式」的构图：对脸取景，而不是原来那台默认机位
+      if (!viewer.focusCharacter()) viewer.resetCamera();
       viewer.start();
       return;
     }
@@ -184,23 +187,30 @@ function CharacterViewer(props: Props) {
     setLoading(true);
     setLoadingStep(1);
     try {
-      // 步骤一：加载模型（本地静态文件）
-      await viewer.loadVrm(character.modelUrl, character.id);
+      // 步骤一：加载模型。仓库自带的是静态路径，导入的是 `local:<id>`（要先去库里换成 blob URL）
+      const modelUrl = await resolveModelUrl(character.modelUrl);
+      await viewer.loadVrm(modelUrl, character.id);
 
-      // 铺房间：?dev=1&room=<id> 可以指定；否则铺「上次用过的房间」，
-      // 第一次进来铺默认房间。不这样做的话首页就是一块灰底空舞台，
-      // 房间/走位/闲逛这些全都不在场，看起来像老版本。
+      // 铺房间：?dev=1&room=<id> 可以指定；否则铺「上次用过的房间」。
+      // **没有偏好就是空舞台**（产品口径，见 roomPreference 的 DEFAULT_ROOM_ID）：
+      // 想让她在房间里走位/闲逛，自己去「3D 房间」里挑一间，挑过的那间会被记住。
       const bootParams = new URLSearchParams(window.location.search);
       const roomParam = bootParams.get('dev') !== null ? bootParams.get('room') : null;
       const wantRoomId = roomParam ?? getPreferredRoomId();
-      if (wantRoomId) {
+      if (wantRoomId && wantRoomId !== EMPTY_ID) {
         const rooms = await loadEnvironmentManifest().catch(() => []);
-        const room = rooms.find((item) => item.id === wantRoomId) ?? rooms.find((item) => item.id === DEFAULT_ROOM_ID);
+        const room = rooms.find((item) => item.id === wantRoomId);
         if (room) {
           await viewer.loadEnvironment(room);
           setPreferredRoomId(room.id);
         }
       }
+
+      // 默认模式：进来就把镜头对到她身上（Hanami 的 frameCamera / 操作条那颗聚焦按钮）。
+      // 位置必须在房间之后：聚焦要按房间包围盒收镜头，房间没铺好会算出墙外的机位。
+      // 后面还有一次「最终机位」——正常的启动路径会走 resetToIdle/房间取景，
+      // 那两步都会动镜头；交互关掉时不会走那两步，所以这次先兜住。
+      viewer.focusCharacter();
 
       // 联调钩子：?walk=x,z 走过去；?sit=nearest 坐到最近的座位（验交互用）
       // 这两个都必须等房间就绪：房间没进来之前 navigator 还没有 environment，
@@ -786,6 +796,11 @@ function CharacterViewer(props: Props) {
       if (useCharacterStore.getState().interactive) {
         viewer.resetToIdle();
       }
+
+      // 默认模式：镜头对脸。必须放在最后 —— 上面 resetToIdle() 内部会 resetCamera
+      // 把机位拉回「胸口高度 + 1.4 m 开外」，房间加载也会 frameToRoom 覆盖一次，
+      // 所以这段要排在它们之后跑，才是最终机位。
+      viewer.focusCharacter();
 
       // 联调钩子：?motion=<片段 id> 直接在台上演一个动作库里的片段（见 public/vrma/index.json）
       const probe = new URLSearchParams(window.location.search).get('motion');

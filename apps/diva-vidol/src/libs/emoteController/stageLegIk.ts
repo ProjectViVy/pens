@@ -2,6 +2,8 @@ import type { VRM } from '@pixiv/three-vrm';
 import { VRMHumanBoneName } from '@pixiv/three-vrm';
 import { Euler, Matrix4, Quaternion, Vector3 } from 'three';
 
+import { updateBodyFrame } from './bodyFrame';
+
 /**
  * 逐腿足底贴地（两骨 IK）。
  *
@@ -51,6 +53,9 @@ export class StageLegIk {
   private quatA = new Quaternion();
   private quatB = new Quaternion();
   private matrix = new Matrix4();
+  /** 身体右方向 / 前方（每帧由 bodyFrame 从两条大腿的位置算） */
+  private bodyRight = new Vector3();
+  private bodyForward = new Vector3();
 
   constructor(private vrm: VRM) {
     const upperL = vrm.humanoid.getNormalizedBoneNode(VRMHumanBoneName.LeftUpperLeg);
@@ -115,17 +120,15 @@ export class StageLegIk {
       // 膝盖只往身体前方弯。极点向量用**身体朝向**，不用「当前膝盖在哪」：
       // 一旦片段（或之前的 IK）把膝盖摆到身体后方，拿当前膝盖当极点会顺着把
       // 它推得更后，越解越反关节。
+      //
+      // 「前方」由两条大腿的世界位置算出来（bodyFrame.ts），不读髋骨局部轴：
+      // VRM0 与 VRM1 的髋骨静止朝向可能差 180°，读局部轴会让导入的 VRM1 人物
+      // 膝盖解到身后去（实测正角在 VRM0 上是反关节、在 VRM1 上却是正常屈膝）。
       const axis = dir;
-      const hipsNode = leg.upper.parent as unknown as {
-        getWorldQuaternion?: (q: Quaternion) => void;
-      } | null;
-      const fwd = this.tmpPerp.set(0, 0, 1);
-      if (hipsNode?.getWorldQuaternion) hipsNode.getWorldQuaternion(this.quatB);
-      else this.quatB.identity();
-      fwd.applyQuaternion(this.quatB);
-      fwd.addScaledVector(axis, -fwd.dot(axis));
-      if (fwd.lengthSq() < 1e-8) fwd.set(0, 0, 1);
-      this.tmpPerp.copy(fwd).normalize();
+      if (!updateBodyFrame(this.vrm, this.bodyRight, this.tmpPerp)) this.tmpPerp.set(0, 0, 1);
+      this.tmpPerp.addScaledVector(axis, -this.tmpPerp.dot(axis));
+      if (this.tmpPerp.lengthSq() < 1e-8) this.tmpPerp.set(0, 0, 1);
+      this.tmpPerp.normalize();
 
       // 余弦定理：膝盖在轴上的投影长度 h1 和高度 hh
       const a = (l1 * l1 - l2 * l2 + dist * dist) / (2 * dist);

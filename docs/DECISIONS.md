@@ -200,6 +200,8 @@ What this does not settle:
 
 ## D-011 — The product is DIVA-OLV; PENS stays the vocabulary
 
+> Superseded by D-017: the DIVA-OLV name was wrong and the product is PENS again.
+
 Proposed by the owner on 2026-11-22 (Asia/Shanghai): 名字需要修改为 DIVA-OLV，备注原项目.
 
 What changed:
@@ -289,6 +291,105 @@ What this does not settle:
 - Whether the 246 MB of VRM assets should get a downloader/`buildLocalAssets`
   step for fresh machines, instead of manual copying.
 - Whether the conversation inside the app should stay a keyword placeholder.
+## D-014 — Imported VRM characters live in the browser, not in the repository
+
+The 人物 settings page gained an import action (2026-11-22). A chosen `.vrm` file is
+stored in IndexedDB (`diva-local-vrm`: `meta` for the list, `blobs` for the file) and
+the character's `modelUrl` becomes `local:<id>`, resolved to a blob URL before
+`viewer.loadVrm`. Deleting it from the same page returns the stage to the default
+character.
+
+Why not write the file into `public/assets/agents/`: the stage is a front-end
+application — it runs in an Electron child window and in an ordinary browser — so it
+has no API for writing to disk. A Next route handler could write those files, but it
+would only work while the dev server runs from the checkout, it would need a
+manifest/rescan step, and it would put a user's model inside the repository working
+tree. IndexedDB costs no server, survives reload and restart, and keeps imported
+avatars out of git, consistent with the asset rule.
+
+Consequences, accepted: imported characters are per-machine (per browser profile);
+they carry no thumbnail (a generated initials tile is used); they are treated as
+female for touch reactions; and the library is invisible to a packaged release that
+starts with a fresh profile.
+## D-015 — Character facing is normalised once, by `VRMUtils.rotateVRM0`
+
+VRM 0.x models are authored facing −Z; VRM 1.0 models face +Z. `VRMUtils.rotateVRM0`
+closes that gap by rotating a VRM0 scene by 180°, so after it every model faces +Z and
+the rest of the stage code (walking, turning, framing) can assume one convention.
+
+`Model.loadVRM` used to set `vrm.scene.rotation.y = Math.PI` unconditionally right
+after `rotateVRM0`. For VRM0 that was the same value the helper had just written, so
+it was invisible; for VRM1 it turned the model another 180°, which made imported
+VRM 1.0 characters stand with their back to the camera and appear to walk backwards
+(the navigator moves along the root's yaw, so the visual front was opposite the
+movement direction). Fixed 2026-11-22 by dropping the second assignment: a model's
+scene rotation is now set only by the spec-aware helper, and the `ModelRoot` shell
+exists solely to carry position and yaw.
+
+Lesson: when a library helper already normalises orientation across spec versions,
+do not stack a constant correction on top of it — the constant is only correct for
+one of the two versions.
+## D-016 — Body axes come from bone positions, never from a bone's local axes
+
+The knee joint limiter computed its hinge axis as the hips bone's local X axis
+rotated into world space, and the foot IK took "body forward" as the hips bone's
+local +Z. Both are only correct for one rig convention. Measured on the two rigs
+the stage actually loads:
+
+| model | hips local X in world | hips local Z in world |
+| --- | --- | --- |
+| 莉莉娅 (VRM 0, VRoid) | (−1, 0, 0) | (0, 0, −1) |
+| 汐 (VRM 1) | (1, 0, 0) | (0, 0, 1) |
+
+The rigs differ by 180° about Y, so on the imported VRM 1.0 character a natural
+forward knee bend read as hyperextension: `clamped` was 2 every single frame and
+the limiter kept snapping her shins back to the 3° extension boundary. Forcing
++60° through the debug knob bent her knee *forward* while the same value bent the
+VRM 0 character's knee *backward* — the axis was simply inverted.
+
+Fix (2026-11-22): `updateBodyFrame()` in `libs/emoteController/bodyFrame.ts`
+derives the body frame from the world positions of the two upper legs — right
+direction = right leg minus left leg, forward = world up × right direction. No
+bone rotation is ever read. Both the knee hinge axis and the IK pole vector use
+it. For VRM 0 rigs the values are identical to the old ones (their hips local X
+happened to equal the anatomical right axis), so built-in characters are
+unaffected; for VRM 1.0 rigs the axis flips to match.
+
+The IK pole change is a fix too, not just a port: on VRM 0 rigs the old pole
+pointed *backward* (hips local +Z is −Z in world there), i.e. opposite to what its
+own comment claimed. It went unnoticed because the IK is skipped whenever the
+ankle is already within 0.005 m of its target, which is the usual standing pose.
+
+Lesson: "this bone's local axis is the body axis" is a rig-convention assumption,
+not a fact. Derive anatomical directions from geometry (relative bone positions),
+which is invariant across exporters, and keep the sign convention anchored to one
+reference rig with measurements.
+
+## D-017 — The product name is PENS; the DIVA-OLV rename is reverted
+
+Corrected on 2026-11-27 (Asia/Shanghai): 改一下名字，DIVA-OLV 这个名字不对，就叫做 PENS.
+
+What changed:
+
+- Every human-visible product name is **PENS** again: window title, wordmark,
+  desktop aria-label, app header hint, settings and about text, notes, the
+  downloaded drawing file, and the packaged artifact name
+  (`dist/PENS-win32-x64/`, `PENS-Demo-Windows-x64.zip`).
+- `package.json` is `pens` / `PENS`; `description` no longer mentions the
+  earlier name.
+- README and the panel notes drop the DIVA-OLV rename paragraph, so a reader is
+  not told the product is called something it is not.
+
+What deliberately did not change:
+
+- The repository is still `pens`, and the document vocabulary (`PEN`, `PENS`)
+  is unchanged.
+- The renderer bridge is still `window.pens` and the session partitions are
+  still `persist:pens-*`; they are internal identifiers and were already PENS.
+
+History: D-011 introduced DIVA-OLV on 2026-11-22; it is marked superseded here.
+Rollback: revert the one commit; no state or data format moved.
+
 ## Proposed technical direction
 
 These recommendations are retained for the next design discussion. They are

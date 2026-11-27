@@ -41,7 +41,7 @@ async function packageDemo() {
     },
   });
 
-  const archive = path.join(outputDirectory, 'DIVA-OLV-Demo-Windows-x64.zip');
+  const archive = path.join(outputDirectory, 'PENS-Demo-Windows-x64.zip');
   execFileSync('tar.exe', [
     '-a', '-c', '-f', archive,
     '-C', path.dirname(bundleDirectory), path.basename(bundleDirectory),

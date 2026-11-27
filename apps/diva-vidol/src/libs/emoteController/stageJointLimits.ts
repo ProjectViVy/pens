@@ -1,6 +1,8 @@
 import type { VRM } from '@pixiv/three-vrm';
 import { Quaternion, Vector3 } from 'three';
 
+import { updateBodyFrame } from './bodyFrame';
+
 /**
  * 膝关节限位（Hanami `jointLimits` 在我们这套骨架上的可用子集）。
  *
@@ -70,6 +72,9 @@ export class StageJointLimits {
   private qWorld = new Quaternion();
   private qParent = new Quaternion();
   private qParentInv = new Quaternion();
+  /** 身体右方向 / 前方，每帧由 bodyFrame 从两条大腿的位置算出来 */
+  private bodyRight = new Vector3();
+  private bodyForward = new Vector3();
   private qLocal = new Quaternion();
 
   constructor(vrm: VRM) {
@@ -113,10 +118,11 @@ export class StageJointLimits {
     this.clamped = 0;
     this.angles.length = 0;
 
-    const hipsNode = humanoid.getNormalizedBoneNode('hips');
-    if (!hipsNode) return;
-    const hipsQ = this.qParent.copy(hipsNode.getWorldQuaternion(new Quaternion()));
-    this.axisWorld.set(1, 0, 0).applyQuaternion(hipsQ).normalize();
+    // 铰链轴取「身体的右方向」，由两条大腿的世界位置算出来（见 bodyFrame.ts）：
+    // 不能再用髋骨局部 X——VRM0 与 VRM1 的髋骨静止朝向可能差 180°，那样会在其中一种规范上
+    // 把正常屈膝读成反关节，膝盖就被限位掰到身后去了。
+    if (!updateBodyFrame(vrm, this.bodyRight, this.bodyForward)) return;
+    this.axisWorld.copy(this.bodyRight);
 
     for (const side of ['left', 'right'] as const) {
       const upper = humanoid.getNormalizedBoneNode(`${side}UpperLeg` as never);

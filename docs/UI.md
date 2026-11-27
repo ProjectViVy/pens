@@ -1,10 +1,10 @@
-# The DIVA-OLV panel
+# The PENS panel
 
 The human-facing surface: an Apple-like launcher with a right-hand activity
 panel. One self-contained HTML file plus a minimal Electron runner. Since
 D-009 these files live at the repository root; since D-010 the 数字人 page opens
-its applications in their own windows; the product was renamed from PENS to
-DIVA-OLV by D-011.
+its applications in their own windows; the product is PENS (the DIVA-OLV rename
+of D-011 was reverted by D-017).
 
 | File | Role |
 | --- | --- |
@@ -15,7 +15,7 @@ DIVA-OLV by D-011.
 | `stage-session.cjs` | Starts `apps/stage-app/server.mjs` as its own process on a free loopback port with a per-session token. |
 | `stage-window.cjs` | Registers the 数字人 window on top of `app-window.cjs`. |
 | `vidol-session.cjs` | Starts DivaVidol (`next dev` in `apps/diva-vidol`, the VRM stage fork) on a free loopback port; explicit error if dependencies are missing. |
-| `vidol-window.cjs` | Registers the DivaVidol window. `package-win.cjs` is the `@electron/packager` build for Windows x64: `dist/DIVA-OLV-win32-x64/` plus a zip. Models, Cubism Core, `node_modules` and `.next` are excluded. |
+| `vidol-window.cjs` | Registers the DivaVidol window. `package-win.cjs` is the `@electron/packager` build for Windows x64: `dist/PENS-win32-x64/` plus a zip. Models, Cubism Core, `node_modules` and `.next` are excluded. |
 
 ## What the UI contains
 
@@ -44,7 +44,7 @@ drawing board, reading, contacts, settings.
 ```
 npm install
 npm start            # electron .
-npm run package:win  # writes dist/DIVA-OLV-win32-x64/ and a zip
+npm run package:win  # writes dist/PENS-win32-x64/ and a zip
 ```
 
 An elevated shell needs `--no-sandbox`; a process without a writable `%APPDATA%`
@@ -103,7 +103,8 @@ by D-009 without content changes.
 - Changed by D-010: the placeholder entries, their page, their empty-state
   branch, and the digital-human tile's in-app page; added the child-window
   wiring.
-- Changed by D-011: every visible product name became DIVA-OLV.
+- Changed by D-011: every visible product name became DIVA-OLV; reverted by
+  D-017 back to PENS.
 - Changed by D-012: the 数字人 page gained DivaVidol; both applications share
   `app-window.cjs`.
 
@@ -119,5 +120,5 @@ This is a UI with two wired applications, not a PENS runtime.
 - The Electron wrapper only runs the UI. It is not the desktop-shell decision
   described in [D-001](DECISIONS.md) and D-005; the shell choice is still
   unratified.
-- The settings screen shows "关于 DIVA-OLV 1.0" while `package.json` says
+- The settings screen shows "关于 PENS 1.0" while `package.json` says
   `0.2.0`.

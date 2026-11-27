@@ -64,7 +64,7 @@ robots.txt
 
 *.patch
 
-# DIVA-OLV: local-only assets and working junk (same policy as the Live2D stage)
+# PENS: local-only assets and working junk (same policy as the Live2D stage)
 /public/assets/
 /public/environments/
 /public/vrma/

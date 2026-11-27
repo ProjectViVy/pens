@@ -553,6 +553,10 @@ export class Viewer {
     const vrm = this.model?.vrm;
     if (!camera || !controls || !vrm) return false;
 
+    // 刚载入模型、还没出过一帧时骨骼的世界矩阵是旧的（全在原地），
+    // 直接读 head 会算出「头顶在原点」，镜头就飞到脚边去。先强制刷一遍。
+    vrm.scene.updateMatrixWorld(true);
+
     const rootObject = this.model?.navRoot ?? vrm.scene;
     const rootX = rootObject?.position.x ?? 0;
     const rootY = rootObject?.position.y ?? 0;
@@ -766,8 +770,10 @@ export class Viewer {
     await this.model.loadIdleAnimation();
 
     // HACK: アニメーションの原点がずれているの再生後にカメラ位置を調整する
+    // 默认模式是「一进来就聚焦人物」，所以这里直接对脸取景；没有 head 骨才退回
+    // 原来那种「把镜头拉到她胸口高度」的归位。
     requestAnimationFrame(() => {
-      this.resetCamera();
+      if (!this.focusCharacter()) this.resetCamera();
     });
 
     this.loadedCharacterId = characterId;

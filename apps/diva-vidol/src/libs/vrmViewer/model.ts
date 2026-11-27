@@ -63,14 +63,16 @@ export class Model {
 
     VRMUtils.rotateVRM0(vrm);
 
-    // 搬过来的 Hanami 片段是按「朝 -Z」制作的（Overte 的朝向），而 lobe 这边的
-    // 走位/落座/取景全都按「rotation.y 0 = 朝 +Z」算。两边差 180°，所以给模型套一层
-    // 只负责转正的外壳：外壳承载走位与转身，里面这 180° 抵消片段的朝向。
-    // 不这样做的话待机时永远是背影（实测 idle / raise-hand 都是背对镜头）。
+    // 朝向只在这里统一一次：VRM0 靠 rotateVRM0 转到「脸朝 +Z」，VRM1 的模型按规范本来就是
+    // 「脸朝 +Z」，所以到这里两种规范都是 +Z，不能再动。
+    //
+    // 以前这里还无条件写了一次 vrm.scene.rotation.y = Math.PI：
+    // 对 VRM0 只是把 rotateVRM0 刚设的同一个值再赋一遍（无害），
+    // 对 VRM1 却等于多转 180°——导入的 VRM1 人物背对镜头，走位看着也成了倒着走。
+    // 外壳只管走位与转身，不掺朝向修正。
     const root = new THREE.Object3D();
     root.name = 'ModelRoot';
     root.add(vrm.scene);
-    vrm.scene.rotation.y = Math.PI;
     this.navRoot = root;
 
     // 手指静息姿势必须写在任何动作播放之前：mixer 会把那一刻的骨骼值当作原值缓存。

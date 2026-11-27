@@ -1,6 +1,6 @@
 # DivaVidol
 
-DIVA-OLV 数字人板块里的第二张卡。来源是主人自己的 **VRM 舞台**项目
+PENS 数字人板块里的第二张卡。来源是主人自己的 **VRM 舞台**项目
 `C:\Users\Administrator\Desktop\diva-stage-vrm` —— 从
 [lobe-vidol](https://github.com/lobehub/lobe-vidol) 分叉出来、改造成「3D 教室场景 + VRM 角色」
 的那个版本。
@@ -55,3 +55,17 @@ next dev -p <随机端口> -H 127.0.0.1
 - 冷启动那一次 Next dev 徽标可能报一次 issue（热启动探测不到）。
 - 对话仍是关键词占位回复，后台没有模型。
 - Watchpack 会去扫 `C:\` 根（`pagefile.sys` 之类报 EINVAL），开发服务器的噪音，不影响页面。
+## 导入人物（设置 → 人物 → 导入 VRM）
+
+设置抽屉的「人物」页有两个来源：仓库自带的 7 套（`public/assets/agents`）+ **本机导入的 VRM**。
+点右上角「导入 VRM」选一个 `.vrm` 文件，它会：
+
+1. 存进浏览器 IndexedDB（库名 `diva-local-vrm`，`meta` 只存名字/大小/时间，`blobs` 存文件本体）；
+2. 立刻上台（`modelUrl` 记成 `local:<id>`，加载前换成 blob URL）；
+3. 出现在「本机导入」区块里，可逐个删除；删掉当前人物会退回默认的莉莉娅。
+
+为什么存浏览器而不是 `public/assets/agents`：舞台是纯前端应用（Electron 子窗口或普通浏览器打开都行），
+没有往磁盘写文件的接口。存 IndexedDB 不需要服务端、不需要重启 dev server，刷新/重启后还在；
+代价是**每台机器各自一份**，换 profile 就没了，也不进仓库（和 Live2D 模型同规则）。
+
+已知限制：导入的人物按女性处理触摸反应；没有缩略图，用名字首字生成占位图。

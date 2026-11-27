@@ -20,6 +20,7 @@ export default {
     regenerate: '重新生成',
   },
   info: {
+    character: '人物',
     chat: '聊天',
     dance: '舞蹈',
     motions: '动作',
@@ -98,6 +99,18 @@ export default {
     grid: '网格',
     axes: '坐标轴',
     downloading: '正在为你准备我的整个世界...',
+  },
+  character: {
+    onStage: '人物',
+    totalCount: '共 {{total}} 个',
+    import: '导入 VRM',
+    importing: '导入中…',
+    importFailed: '导入失败：{{message}}',
+    localBadge: '本地',
+    localTitle: '本机导入（存在浏览器里，不进仓库）',
+    remove: '删除',
+    cancel: '取消',
+    removeConfirm: '把「{{name}}」从本机人物库里删掉？台上会退回默认人物。',
   },
   animation: {
     animationList: '动作列表',

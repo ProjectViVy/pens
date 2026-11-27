@@ -83,6 +83,8 @@ const StageList = ({ className, style }: StageListProps) => {
     setStageId(undefined);
     if (id === EMPTY_ID) {
       viewer.unloadEnvironment();
+      // 选空舞台也要记住：不然下次刷新又把刚才那间房铺回来
+      setPreferredRoomId(EMPTY_ID);
       return;
     }
     // 注意：GridList 回传的是它自己拼的条目（只有 id/name/detail/spin），
